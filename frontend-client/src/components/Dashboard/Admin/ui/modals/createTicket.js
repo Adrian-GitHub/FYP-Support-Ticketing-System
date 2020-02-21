@@ -5,7 +5,8 @@ export default async function createTicket(data) {
     title: parsedData[0],
     createdBy: parsedData[1],
     description: parsedData[2],
-    ticketState: parsedData[3],
+    // adding one because array starts at 0-14, but actual values are 1-15
+    ticketState: Number(parsedData[3]) + 1,
     currentStaff: parsedData[4]
   };
   //fetch request, sending user's data to our server

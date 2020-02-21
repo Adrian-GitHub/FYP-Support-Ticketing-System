@@ -19,7 +19,10 @@ export function askForMoreInfo(ticket) {
         }
       }).then((res) => res.json()).then((data) => {
         if(data.status === 'success'){
-           Swal.fire('Updated!', 'User needs to respond now.', 'success');
+           Swal.fire('Updated!', 'User needs to respond now.', 'success').then(function() {
+            // Reload the page
+            window.location.reload();
+          });
         }
       }).catch((error) => {
         console.log(error);

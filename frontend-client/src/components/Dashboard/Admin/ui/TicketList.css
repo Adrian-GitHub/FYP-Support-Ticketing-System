@@ -48,6 +48,9 @@
         margin: 0 auto;
     }
 }
+.touchEvent{
+    cursor: pointer;
+}
 @media only screen and (max-width: 1024px){
     .mobileText{
         margin: 0 auto;

@@ -47,7 +47,7 @@ class changeStatus extends Component {
                 icon: <Icon type="smile" style={{ color: '#32cd32' }} />,
               });
               // Close modal
-              this.props.hideModal();
+              this.props.hideModal(); 
           }
       }).catch((error) => {
         console.log(error);

@@ -3,6 +3,13 @@ import {List, Card} from 'antd';
 
 export default class Stats extends React.Component {
     render() {
+        let closedTickets = 0;
+        this.props.ticketData.forEach(element => {
+            // Last 4 out of 15, are close statuses
+            if(element.status >= 11 || element.status === 7 || element.status === 9){
+                closedTickets++;
+            }
+        });
         const data = [
             {
                 title: 'Total Tickets',
@@ -10,15 +17,15 @@ export default class Stats extends React.Component {
             },
             {
                 title: 'Closed Tickets',
-                data: '0X0'
+                data: closedTickets
             },
             {
                 title: 'Client Count',
-                data: '0X0'
+                data: this.props.user
             },
             {
-                title: 'User(Admin+Staff+Clients) Count',
-                data: '0X0'
+                title: 'Staff Count',
+                data: this.props.staff
             }
         ];
         return (

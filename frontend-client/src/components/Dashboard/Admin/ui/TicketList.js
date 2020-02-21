@@ -32,7 +32,7 @@ export default class TicketList extends Component {
           <div className="desktop">
                 <List itemLayout="vertical" size="xs" pagination={{onChange: page => {console.log(page); }, pageSize: 3,}} dataSource={this.props.data} 
                     renderItem={item => (
-                    <List.Item onClick={() => this.showTicket(item) } key={item.title}>
+                    <List.Item className="touchEvent" onClick={() => this.showTicket(item) } key={item.title}>
                         <List.Item.Meta
                         title={<a className="mobileText" href={item._id}>{item.title}</a>}
                         description={item.desc}

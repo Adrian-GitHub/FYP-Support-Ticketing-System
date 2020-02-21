@@ -19,7 +19,10 @@ export function deleteModal(ticket) {
         }
       }).then((res) => res.json()).then((data) => {
         if(data.status === 'success'){
-           Swal.fire('Deleted!', 'This ticket has been deleted.', 'success');
+           Swal.fire('Deleted!', 'This ticket has been deleted.', 'success').then(function() {
+            // Reload the page
+            window.location.reload();
+          });
         }
       }).catch((error) => {
         console.log(error);

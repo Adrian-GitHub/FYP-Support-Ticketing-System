@@ -35,7 +35,7 @@ class assignStaff extends Component {
     }).then((res) => res.json()).then((data) => {
       if(data.status === 'success'){
         notification.open({
-          message: 'Notification Title',
+          message: 'Staff assigned!',
           description:
             'Hooray! Staff has been successfully assigned to this ticket.',
           icon: <Icon type="smile" style={{ color: '#32cd32' }} />,

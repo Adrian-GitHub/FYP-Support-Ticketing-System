@@ -13,7 +13,8 @@ import 'antd/dist/antd.css';
 
 // Array for ticket data
 const ticketData = [];
-
+// Variables for counters
+let userCount = 0, staffCount = 0;
 class admin_dashboard extends Component {
       constructor(){
         super();
@@ -21,7 +22,7 @@ class admin_dashboard extends Component {
       }
       //After mounting, fetch the data from DB and feed it to the components
       componentDidMount(){
-          fetch('/api/admin/GetTickets', {
+          fetch('/api/admin/GetStats', {
             // Just making  POST request without body as we don't have anything particular in mind as we want it all
             method: 'POST',
             headers: {
@@ -29,6 +30,10 @@ class admin_dashboard extends Component {
             }}).then((res) => res.json()).then((data) => { // make response data accessible by dot notation
               // Assign the returned response into our state object
               const returnedData = data.files;
+
+              userCount = data.userCount;
+              staffCount = data.staffCount;
+
               returnedData.forEach(element => {
                 const date = new Date(element.creationDate).toLocaleString();
                 ticketData.push({
@@ -53,7 +58,7 @@ class admin_dashboard extends Component {
             <div>
                 <Navi />
                 <WelcomeHeader name={"admin_the_boss"}/>
-                <Statistics ticketData={ticketData} />
+                <Statistics ticketData={ticketData} user={userCount} staff={staffCount} />
                 <TicketList data={ticketData} />
             </div>
         );
