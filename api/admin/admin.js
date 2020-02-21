@@ -1,12 +1,15 @@
 const express = require("express");
 const router = express.Router();
-// Load Admin model for MongoDB(used by Mongoose)
-const Admin = require('../../database/models/Admin/Admin_Account');
+// Load User model for MongoDB(used by Mongoose)
+const User = require('../../database/models/User_Account');
 // Ticket Model
-const Ticket = require('../../database/models/Ticket/Ticket_Process');
+const Ticket = require('../../database/models/Ticket_Process');
+// Ticket History Model
+const TicketHistory = require('../../database/models/Ticket_History');
 // MongoDB
 var MongoClient = require('../../database/config/DatabaseConnection');
 var connection = MongoClient.getDb();
+const ObjectId = require('mongodb').ObjectId;
 // Hashing
 const crypto = require('crypto');
 
@@ -21,7 +24,7 @@ router.post("/Register", (req, res) => { // Form validation
                 // Hash the password using the generated salt
                 let hashedPassword = hashPassword(req.body.password, salt);
                 // Create new user
-                const newUser = new Admin({ name: req.body.name, username: req.body.username, password: hashedPassword, salt: salt });
+                const newUser = new User({ name: req.body.name, username: req.body.username, password: hashedPassword, salt: salt, isWho: 'admin' });
                 // We have the data, user with hashed password. Now send data to mongoDB
                 // Put all data at main/users collection
                 connection.collection("users").insertOne(newUser, function (err, res) {
@@ -45,7 +48,7 @@ function hashPassword(password, salt){
 router.post("/NewTicket", (req, res) => { // Create new ticket with all data being customised
     // Data was sent from the admin dashboard
     // Create new ticket based on the data given to us
-    const newTicket = new Ticket({ title: req.body.title, desc: req.body.description, createdBy: req.body.createdBy , currentSupportStaff: req.body.currentStaff, stage: req.body.ticketState ? req.body.ticketState : 0});
+    const newTicket = new Ticket({ title: req.body.title, desc: req.body.description, createdBy: req.body.createdBy , currentSupportStaff: req.body.currentStaff ? req.body.currentStaff : 'free', status: req.body.ticketState ? req.body.ticketState : 1});
     // Open DB and then insert new ticket using Ticket Model defined
     connection.collection("tickets").insertOne(newTicket, function (err, res) {
         // If something went wrong, throw the error
@@ -109,6 +112,76 @@ router.post("/GetStaffList", (req, res) => {
         // Send constructed JSON from MongoDB data via RES to the frontend
         res.json({staffData: staffData})
       });
+});
+// Assigns staff to the ticket
+router.post('/AssignStaff', (req,res) => {
+    // We are receiving ID and NAME of staff and Ticket ID
+    // Assign it to the ticket
+    connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"currentSupportStaff": req.body.name, "staffId": req.body.id}}, (err, res) => {
+        if(err) throw err;
+    });
+    // Now create a history of the ticket
+    const username = req.cookies['username'];
+    // Define it first
+    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: req.body.id, action: 'Staff_Assign', desc: 'Admin action', staffName: username});
+    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
+        // If something went wrong, throw the error
+        if (err)
+            throw err;
+        // Else console log for reference that staff was assigned to a ticket by admin
+        console.log("Staff assigned by admin to ticket " + req.body.ticketID);
+    });
+    // Return status
+    res.json({status: 'success'});
+});
+// Chaning the status of a ticket
+router.post('/ChangeStatus', (req, res) => {
+    // Firstly, we update the ticket
+    connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": Number(req.body.ticketStatus)}}, (err, res) => {
+        if(err) throw err;
+    });
+    // Now, create a record of this action
+    // Get user ID that was set during the login session
+    const userID = req.cookies['user_id'];
+    const username = req.cookies['username'];
+    //Build the object
+    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: userID, action: 'Update_Ticket_Status', desc: req.body.desc, staffName: username});
+    //Insert
+    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
+        // If something went wrong, throw the error
+        if (err)
+            throw err;
+        // Else console log for reference that staff was assigned to a ticket by admin
+        console.log("Ticket status changed by admin to ticket " + req.body.ticketID);
+    });
+    res.json({status: 'success'});
+});
+router.post('/DeleteTicket', (req, res) => {
+    // Firstly, we update the ticket
+    connection.collection("tickets").findOneAndDelete({"_id": ObjectId(req.body.ticketID)}, (err, res) => {
+        if(err) throw err;
+    });
+    res.json({status: 'success'});
+});
+router.post('/AskForMoreInformation', (req, res) => {
+    // Update the ticket, with status 10. Status 10 means ASK FOR MORE INFORMATION
+    connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 10}}, (err, res) => {
+        if(err) throw err;
+    });
+    // Get variables
+    const userID = req.cookies['user_id'];
+    const username = req.cookies['username'];
+    //Build the object
+    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: userID, action: 'Ask_for_more_information', desc: "More information is needed!", staffName: username});
+    //Insert
+    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
+        // If something went wrong, throw the error
+        if (err)
+            throw err;
+        // Else console log for reference that staff was assigned to a ticket by admin
+        console.log("Ticket status changed by admin to ticket " + req.body.ticketID);
+    });
+    res.json({status: 'success'});
 });
 module.exports = router;
 

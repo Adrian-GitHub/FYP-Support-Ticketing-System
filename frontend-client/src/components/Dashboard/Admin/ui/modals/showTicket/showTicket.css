@@ -1,0 +1,26 @@
+.options{
+    text-align: center;
+    margin: 5px;
+}
+.buttons{
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    text-align: center;
+}
+.buttons>*{
+    margin: 5px;
+}
+
+.modal{
+    width: 65vw;
+}
+@media only screen and (max-width: 1024px){
+    .ant-modal-content {
+        position: absolute;
+        left: 5px;
+        width: 85vw;
+    }
+}
