@@ -24,6 +24,7 @@ const Ticket_Process = new Schema({
         type: String,
         default: "free"
     },
+    //status should be fixed here.
     stage: {
         type: Number,
         default: 0
