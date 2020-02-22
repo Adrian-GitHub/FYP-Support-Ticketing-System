@@ -46,9 +46,11 @@ function hashPassword(password, salt){
 }
 // New Ticket Creation
 router.post("/NewTicket", (req, res) => { // Create new ticket with all data being customised
+    // Cookie user id created when logged in
+    const user_id = req.cookies['user_id'];
     // Data was sent from the admin dashboard
     // Create new ticket based on the data given to us
-    const newTicket = new Ticket({ title: req.body.title, desc: req.body.description, createdBy: req.body.createdBy , currentSupportStaff: req.body.currentStaff ? req.body.currentStaff : 'free', status: req.body.ticketState ? req.body.ticketState : 1});
+    const newTicket = new Ticket({ title: req.body.title, desc: req.body.description, createdBy: req.body.createdBy, createdById: user_id , currentSupportStaff: req.body.currentStaff ? req.body.currentStaff : 'free', status: req.body.ticketState ? req.body.ticketState : 1});
     // Open DB and then insert new ticket using Ticket Model defined
     connection.collection("tickets").insertOne(newTicket, function (err, res) {
         // If something went wrong, throw the error

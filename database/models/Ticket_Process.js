@@ -20,6 +20,10 @@ const Ticket_Process = new Schema({
         type: String,
         required: true
     },
+    createdById: {
+        type: String, 
+        required: true
+    },
     // AKA staff name
     currentSupportStaff: {
         type: String,
