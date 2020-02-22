@@ -1,27 +1,109 @@
 import React, { Component } from 'react';
 import './Dashboard.css';
-import { List, Badge, Comment, Tooltip } from 'antd';
+import { List, Badge, Comment, notification, Icon } from 'antd';
 import { Button } from 'react-bootstrap';
+import getStatus from '../../Admin/ui/modals/showTicket/api/getStatus';
+import { withRouter } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const data = [
   {
-      title: 'Ticket BA-DUM-TSH',
-      desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
-      dateCreated: '25/25/2525, 13:24'
+      title: 'LOADING YOUR TICKETS',
+      desc: 'PLEASE BEAR WITH US',
+      dateCreated: 'IT WON\'T TAKE LONG'
   },
-  {
-    title: 'Ticket BA-DUM-TSH',
-    desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
-    dateCreated: '25/25/2525, 13:24'
-    },
-    {
-        title: 'Ticket BA-DUM-TSH',
-        desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
-        dateCreated: '25/25/2525, 13:24'
-    }
 ];
-export default class Dashboard extends Component {
+class Dashboard extends Component {
+    state = {};
+    constructor(){
+        super();
+        this.state = ({
+            tickets: data,
+            currentItem: {title: '', desc: '', dateCreated: '', staff: '', status: ''}
+        })
+    }
+    // When component is "loaded", fetch ticket data corresponding to this user
+    componentDidMount(){
+        fetch('/api/client/GetTickets', {
+            method: 'POST',
+            // We are not sending anything as user is authed in the backend as well, so we will verify his authenticity there
+            headers: {
+              "Content-Type": "application/json"
+            }
+          }).then((res) => res.json()).then((data) => {
+             if(data.status === 'not_authed'){
+                notification.open({
+                    message: 'Error!',
+                    description:
+                      'You must be logged in to access that data.',
+                    icon: <Icon type="warning" style={{ color: '#ff0000' }} />,
+                  });
+                  this.props.history.push("/Login");
+             }
+             else if(data.status === 'success'){
+                //temp var
+                let tempTickets = [];
+                //for each element, push it onto our temp var and then update state with it
+                data.tickets.forEach(element => {
+                const date = new Date(element.creationDate).toLocaleString();
+                const status = getStatus(element.status);
+                let staff;
+                if(element.currentSupportStaff === 'free'){ staff = 'NOT YET TAKEN'} else staff = element.currentSupportStaff;
+                const comments = element.comments ? element.comments : 'CURRENTLY NONE';
+                const commentsAuthor = element.commentsAuthor ? element.commentsAuthor : ''
+                    tempTickets.push({
+                        id: element._id,
+                        title: element.title,
+                        desc: element.desc,
+                        dateCreated: date,
+                        staff: staff,
+                        status: status,
+                        commentsAuthor: commentsAuthor,
+                        comments: comments
+                    });
+                    this.setState({tickets: tempTickets});
+                });
+             }
+          }).catch((error) => {
+            console.log(error);
+          });
+    }
+    closeTicket(){
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, close my ticket'
+          }).then((result) => {
+            if (result.value) {
+                fetch('/api/client/CloseTicket', {
+                    method: 'POST',
+                    body: JSON.stringify({id: this.state.currentItem.id}),
+                    headers: {
+                      "Content-Type": "application/json"
+                    }
+                  }).then((res) => res.json()).then((data) => {
+                     if(data.status === 'success'){
+                         Swal.fire('Success!', 'Ticket Closed', 'success');
+                         window.location.reload();
+                     }
+                  }).catch((error) => {
+                    console.log(error);
+                  });                
+            }
+          })        
+    }
+    viewTicket(item){
+        this.setState({currentItem: item})
+    }
     render(){
+        // USER CAN ONLY CANCEL TICKET FROM CERTAIN STATUS POINTS. THESE POINTS ARE
+        // 1. ENTRY POINT, 5. Check Ticket, in our case true or false
+        let cancellation = false;
+        if(this.state.currentItem.status === 'Ticket Opened' || this.state.currentItem.status === 'Check Ticket') cancellation = true;
       return (
         <div className="dashboard">
             <div className="split left">
@@ -31,16 +113,16 @@ export default class Dashboard extends Component {
                     <List
                     header={<div className="tixHeader">Tickets created by you</div>}
                     bordered
-                    dataSource={data}
+                    dataSource={this.state.tickets}
                     renderItem={item => (
-                        <List.Item className="item">
+                        <List.Item onClick={() => this.viewTicket(item)} className="item">
                             <div>
                                 <h5>{item.title}</h5>
                                 <p>{item.desc}</p>
                                 <div className="toolbar">
                                     <div className="date">Date Created: {item.dateCreated}</div>
-                                    <div className="status">Status: Solved</div>
-                                    <div>Current Staff Member: Julia </div>
+                                    <div className="status">Status: {item.status}</div>
+                                    <div>Current Staff Member: {item.staff} </div>
                                 </div>
                             </div>
                         </List.Item>
@@ -57,31 +139,24 @@ export default class Dashboard extends Component {
                         <h5>IF EMPTY, CLICK ON THE LEFT TO LOAD THE TICKET</h5>
                     </div>
                     <div className="ticketView">
-                        <h4>Ticket Title: TEST TICKET IS THIS IT?</h4>
-                        <p className="ticketDesc"><span className="ticketDescHeader">Ticket Desc</span>: HOW AWESOME IS THIS HOW AWESOME IS THIS HOW AWESOME IS THIS HOW AWESOME IS THIS HOW AWESOME IS THIS HOW AWESOME IS THIS HOW AWESOME IS THIS HOW AWESOME IS THIS HOW AWESOME IS THIS HOW AWESOME IS THIS HOW AWESOME IS THIS HOW AWESOME IS THISHOW AWESOME IS THISHOW AWESOME IS THIS HOW AWESOME IS THIS</p>
-                        <span className="curStaff">Staff Member assigned to it: <span className="currentStaffHeader">JULIA</span></span>
-                        <span className="status">The status of the ticket is : <Badge count={'SOLVED'} style={{ backgroundColor: '#52c41a' }} /></span>
+                        <h4>Ticket Title: {this.state.currentItem.title}</h4>
+                        <p className="ticketDesc"><span className="ticketDescHeader">Ticket Desc</span>: {this.state.currentItem.desc}</p>
+                        <span className="curStaff">Staff Member assigned to it: <span className="currentStaffHeader">{this.state.currentItem.staff}</span></span>
+                        <span className="status">The status of the ticket is : <Badge count={this.state.currentItem.status} style={{ backgroundColor: '#52c41a' }} /></span>
                         <div className="commentsContainer">
                             <h6 className="staff-comments">Comments by staff:</h6>
                             <Comment
-                                author={<span>Han Solo</span>}
+                                author={<span>{this.state.currentItem.commentsAuthor}</span>}
                                 content={
                                 <p>
-                                    We supply a series of design principles, practical patterns and high quality design
-                                    resources (Sketch and Axure), to help people create their product prototypes beautifully
-                                    and efficiently.
+                                    {this.state.currentItem.comments}
                                 </p>
-                                }
-                                datetime={
-                                <Tooltip title={'date'}>
-                                    <span>{'yes'}</span>
-                                </Tooltip>
                                 }
                             />
                         </div>
                         <div className="button-toolbar centered">
                             <Button>SUBMIT MORE INFORMATION(voluntary)</Button>
-                            <Button variant="danger">CLOSE TICKET</Button>
+                            {cancellation ? <Button variant="danger" onClick={() => this.closeTicket()}>CLOSE TICKET</Button> : null }
                         </div>
                     </div>
                 </div>
@@ -90,3 +165,4 @@ export default class Dashboard extends Component {
       );
     }
 }
+export default withRouter(Dashboard);

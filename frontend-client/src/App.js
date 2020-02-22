@@ -15,7 +15,8 @@ import Login from "./components/Authentication/Shared/Login";
 import Admin_Dashboard from "./components/Dashboard/Admin/admin_dashboard";
 import Support_Dashboard from "./components/Dashboard/Support/support_dashboard";
 import Client_Dashboard from "./components/Dashboard/Client/client_dashboard";
-
+// Profile Screens
+import Client_Profile from "./components/Dashboard/Client/ui/AccountSettings"
 class App extends Component {
     render() {
         return (
@@ -29,6 +30,7 @@ class App extends Component {
                     <Route exact path="/Admin_Dashboard"        component={Admin_Dashboard}/>
                     <Route exact path="/Support_Dashboard"      component={Support_Dashboard}/>
                     <Route exact path="/Dashboard"              component={Client_Dashboard}/>
+                    <Route exact path="/Profile"                component={Client_Profile}/>
                 </div>
             </Router>
         );

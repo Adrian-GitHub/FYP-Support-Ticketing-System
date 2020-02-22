@@ -1,9 +1,9 @@
 import React from 'react';
-import {Navbar, Nav} from 'react-bootstrap';
-
+import { Nav, Navbar } from 'react-bootstrap';
+import Staff from './modals/Staff_Modal';
 // Modal, new ticket creation
 import NewTicket from './modals/Ticket_Modal';
-import Staff from './modals/Staff_Modal';
+
 
 export default class Navi extends React.Component {
     constructor(){

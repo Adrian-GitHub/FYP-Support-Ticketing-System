@@ -1,4 +1,4 @@
-import { Modal, Table, Popconfirm, notification, Icon } from 'antd';
+import { Modal, Popconfirm, Table } from 'antd';
 import React, { Component } from 'react';
 
 const dummyContainer = [];
