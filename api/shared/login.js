@@ -35,6 +35,7 @@ router.post("/Login", (req, res) => { // Form validation
                    res.cookie('authenticated_user', token , { expires: new Date(Date.now() + 3600000), httpOnly: true })
                    // A normal cookie, containing userID
                    res.cookie('user_id', user._id);
+                   res.cookie('name', user.name);
                    res.cookie('username', username);
                    //Notify the user
                    res.json({ status: "Authed_" + user.isWho });
@@ -46,5 +47,14 @@ router.post("/Login", (req, res) => { // Form validation
                res.json({status: "Not_Authed"});
            }
        });
+});
+//Logout user
+router.post("/Logout", (req, res) => {
+    //Clearing all cookies created by us
+    res.clearCookie("authenticated_user");
+    res.clearCookie("username");
+    res.clearCookie("name");
+    res.clearCookie("user_id");
+    res.json({status: "success"})
 });
 module.exports = router;

@@ -89,14 +89,6 @@ router.post("/GetTickets", (req, res) => {
           res.json({status: 'success', tickets: ticketData})
       });
 });
-//Logout user
-router.post("/Logout", (req, res) => {
-    //Clearing all cookies created by us
-    res.clearCookie("authenticated_user");
-    res.clearCookie("username");
-    res.clearCookie("user_id");
-    res.json({status: "success"})
-});
 router.post("/GetUserData", (req, res) => {
     //Variable that will be returned via json response
     const userData = [];

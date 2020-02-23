@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
-// Load User's model for MongoDB(used by Mongoose)
+// Load models for MongoDB(used by Mongoose)
 const User = require("../../database/models/User_Account");
+const TicketHistory = require("../../database/models/Ticket_History");
 // MongoDB
 var MongoClient = require('../../database/config/DatabaseConnection');
 var connection = MongoClient.getDb();
+const ObjectId = require('mongodb').ObjectId;
 // Hashing
 const crypto = require('crypto');
 
@@ -38,6 +40,194 @@ function hashPassword(password, salt){
                     if (err)
                         throw err;
                 }).toString('hex')
-}
+};
+router.post("/GetMyTickets", (req, res) => {
+    const username = req.cookies['username'];
+    const user_id = req.cookies['user_id'];
+    if(!username)// if username is not defined
+    {
+        //User is not authed properly then
+        res.json({status: 'not_authed'});
+    }
+    var cursor = connection.collection('tickets').find();
+    // Construct that Data into the object
+    const ticketData = [];
+    // Execute the each command, triggers for each document
+    cursor.forEach(function(doc) {
+         // If the item is null then the cursor is empty
+         if(doc == null) {
+            //quit
+            return;
+        }   
+        // If ticket doesn't bear support's staff ID then skip
+        const id = doc.staffId;
+        if(id === user_id) {ticketData.push(doc)}
+          // otherwise, do something with the item
+          // push it to our array
+        else return;
+      }, function(err) {
+          //done by error
+          res.json({status: 'success', tickets: ticketData})
+      });
+});
+router.post("/GetAvailableTickets", (req, res) => {
+    var cursor = connection.collection('tickets').find();
+    // Construct that Data into the object
+    const ticketData = [];
+    // Execute the each command, triggers for each document
+    cursor.forEach(function(doc) {
+         // If the item is null then the cursor is empty
+         if(doc == null) {
+            //quit
+            return;
+        }   
+        // 'free' means that ticket can be claimed
+        if(doc.staffId !== 'free') {return;}
+          // otherwise, do something with the item
+          // push it to our array
+          ticketData.push(doc);
+      }, function(err) {
+          //done by error
+          res.json({status: 'success', tickets: ticketData})
+      });
+});
+router.post("/ClaimTicket", (req, res) => {
+    const name = req.cookies['name'];
+    const user_id = req.cookies['user_id'];
+    connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"currentSupportStaff": name, "staffId": user_id}}, (err, res) => {
+        if(err) throw err;
+    });
+    res.json({status: 'success'});
+});
+router.post("/AskForMoreInformation", (req, res) => {
+    const name = req.cookies['name'];
+    const user_id = req.cookies['user_id'];
+    connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 10}}, (err, res) => {
+        if(err) throw err;
+    });
+    //History
+    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: user_id, action: 'Ask for more information', desc: req.body.ticketDesc, staffName: name});
+    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
+        // If something went wrong, throw the error
+        if (err)
+            throw err;
+        // Else console log for reference that staff was assigned to a ticket by admin
+        console.log("Support Staff member just asked for more information.");
+    });
+    res.json({status: 'success'});
+});
+router.post("/SuspendTicket", (req, res) => {
+    const name = req.cookies['name'];
+    const user_id = req.cookies['user_id'];
+    connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 9}}, (err, res) => {
+        if(err) throw err;
+    });
+    //History
+    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: user_id, action: 'Ticket Suspended', desc: "Suspended by Staff", staffName: name});
+    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
+        // If something went wrong, throw the error
+        if (err)
+            throw err;
+        // Else console log for reference that staff was assigned to a ticket by admin
+        console.log("Support Staff member just suspended a ticket.");
+    });
+    res.json({status: 'success'});
+});
+router.post("/CloseTicket", (req, res) => {
+    const name = req.cookies['name'];
+    const user_id = req.cookies['user_id'];
+    connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 11}}, (err, res) => {
+        if(err) throw err;
+    });
+    //History
+    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: user_id, action: 'Ticket Closed', desc: "Closed by Staff member", staffName: name});
+    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
+        // If something went wrong, throw the error
+        if (err)
+            throw err;
+        // Else console log for reference that staff was assigned to a ticket by admin
+        console.log("Support Staff member just closed a ticket.");
+    });
+    res.json({status: 'success'});
+});
+router.post("/CloseExpiredTicket", (req, res) => {
+    const name = req.cookies['name'];
+    const user_id = req.cookies['user_id'];
+    connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 12}}, (err, res) => {
+        if(err) throw err;
+    });
+    //History
+    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: user_id, action: 'Expired Ticket Closed', desc: "Closed by Staff member", staffName: name});
+    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
+        // If something went wrong, throw the error
+        if (err)
+            throw err;
+        // Else console log for reference that staff was assigned to a ticket by admin
+        console.log("Support Staff member just closed expired ticket.");
+    });
+    res.json({status: 'success'});
+});
+router.post("/CloseAbandonedTicket", (req, res) => {
+    const name = req.cookies['name'];
+    const user_id = req.cookies['user_id'];
+    connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 15}}, (err, res) => {
+        if(err) throw err;
+    });
+    //History
+    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: user_id, action: 'Abandoned Ticket Closed', desc: "Closed by Staff member", staffName: name});
+    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
+        // If something went wrong, throw the error
+        if (err)
+            throw err;
+        // Else console log for reference that staff was assigned to a ticket by admin
+        console.log("Support Staff member just closed abandoned ticket.");
+    });
+    res.json({status: 'success'});
+});
+router.post("/SolveTicket", (req, res) => {
+    const name = req.cookies['name'];
+    const user_id = req.cookies['user_id'];
+    connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 7}}, (err, res) => {
+        if(err) throw err;
+    });
+    //History
+    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: user_id, action: 'Ticket Solved', desc: req.body.ticketDesc, staffName: name});
+    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
+        // If something went wrong, throw the error
+        if (err)
+            throw err;
+        // Else console log for reference that staff was assigned to a ticket by admin
+        console.log("Support Staff member just solved a ticket.");
+    });
+    res.json({status: 'success'});
+});
+router.post("/ReallocateTicket", (req, res) => {
+    const name = req.cookies['name'];
+    const user_id = req.cookies['user_id'];
+    connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 6, "currentSupportStaff": 'free', "staffId": 'free'}}, (err, res) => {
+        if(err) throw err;
+    });
+    //History
+    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: user_id, action: 'Ticket Reallocated', desc: "Ticket Reallocated by Staff member", staffName: name});
+    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
+        // If something went wrong, throw the error
+        if (err)
+            throw err;
+        // Else console log for reference that staff was assigned to a ticket by admin
+        console.log("Support Staff member just reallocated a ticket.");
+    });
+    res.json({status: 'success'});
+});
+router.post("/OpenTicketOnBehalf", (req, res) => {
+        const username = req.cookies['username'];
+        const user_id = req.cookies['user_id'];
+        const newTicket = new Ticket({ title: req.body.ticketTitle, ticketDesc: req.body.description, createdBy: req.body.onBehalf, createdById: user_id , currentSupportStaff: username, staffId: user_id, status: 2});
+        connection.collection("tickets").insertOne(newTicket, function (err, res) {
+            if (err)
+                throw err;
+            console.log("New Ticket was created by Support on Behalf of " + req.body.onBehalf);
+        });
+        res.json({status: "ticket_created"})
+});
 module.exports = router;
 

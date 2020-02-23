@@ -39,7 +39,7 @@ const Ticket_Process = new Schema({
     },
     staffId: {
         type: String,
-        default: '0x0'
+        default: 'free'
     },
 });
 module.exports = Ticket = mongoose.model("ticket", Ticket_Process);
