@@ -1,13 +1,23 @@
 import React, { Component } from 'react';
+// Navbar
+import Navi from './ui/Navi';
+// Main Screen
+import Dashboard from './ui/Dashboard';
 
 class support_dashboard extends Component {
-    render() {
+      constructor(){
+        super();
+        this.setState({ update: false });
+      }
+      render() {
         return (
             <div>
-                WELCOME TO THE SUPPORT <h1>DASHBOARD</h1>
+                <Navi user={'hieee'}/>
+                <Dashboard />
             </div>
         );
-    }
+      }
 }
 
 export default support_dashboard;
+

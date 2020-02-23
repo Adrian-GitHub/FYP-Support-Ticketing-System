@@ -23,7 +23,7 @@ export default function getStatus(status) {
     case 11:
       return 'Ticket Closed';
     case 12:
-      return 'Ticket Exired(CLS)';
+      return 'Ticket Expired(CLS)';
     case 13:
       return 'Ticket cancelled by Support';
     case 14:
