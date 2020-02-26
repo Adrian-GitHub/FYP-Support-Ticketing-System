@@ -60,6 +60,9 @@ router.post("/NewTicket", (req, res) => { // Create new ticket with all data bei
         console.log("New Ticket was created by Admin");
         // Return status
     });
+    const newTicketHistory = new TicketHistory({ticketID: ticketID, staffId: user_id, action: 'Ticket Created', desc: "Ticket created by Admin", staffName: 'ADMIN'});
+    onnection.collection("ticketHistory").updateOne({ticketID: ObjectId(ticketID)},{"$push":{record: {newTicketHistory}}});
+    console.log("<PROCESS_MODIFIED>New Ticket was created by Admin");
     return res.json({status: "ticket_created"})
 });
 

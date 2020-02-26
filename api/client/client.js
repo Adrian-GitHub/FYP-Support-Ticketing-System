@@ -46,7 +46,10 @@ function hashPassword(password, salt){
 
 // Create new ticket
 router.post("/CreateTicket", (req, res) => {
+    // Ticket ID will be populated later
+    let ticketID;
     const username = req.cookies['username'];
+    const name = req.cookies['name'];
     const user_id = req.cookies['user_id'];
     const newTicket = new Ticket({ title: req.body.ticketTitle, desc: req.body.ticketDesc, createdBy: username, createdById: user_id , currentSupportStaff: 'free', status: 1});
     // Open DB and then insert new ticket using Ticket Model defined
@@ -56,8 +59,12 @@ router.post("/CreateTicket", (req, res) => {
             throw err;
         // Else console log for reference that new ticket was created by client
         console.log("New Ticket was created by Client " + username);
-        // Return status
+        // Assign the value of inserted ID to our variable
+        ticketID = res.insertedId;
     });
+    const newTicketHistory = new TicketHistory({ticketID: ticketID, staffId: user_id, action: 'Ticket Created', desc: "Ticket Created by " + name, staffName: 'CLIENT'});
+    onnection.collection("ticketHistory").updateOne({ticketID: ObjectId(ticketID)},{"$push":{record: {newTicketHistory}}});
+    console.log("<PROCESS_MODIFIED>New Ticket was created by Client");
     return res.json({status: "success"})
 });
 // Get All Tickets belonging to this user

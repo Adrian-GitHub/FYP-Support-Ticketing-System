@@ -97,6 +97,8 @@ router.post("/ClaimTicket", (req, res) => {
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"currentSupportStaff": name, "staffId": user_id}}, (err, res) => {
         if(err) throw err;
     });
+    connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {staffId: user_id, action: 'Ticket Claimed', desc: "Ticket was claimed by ", staffName: name, date: new Date().toISOString()}}});
+    console.log("<PROCESS_MODIFIED>Support Staff claimed a ticket for themselves.");
     res.json({status: 'success'});
 });
 router.post("/AskForMoreInformation", (req, res) => {
@@ -106,14 +108,8 @@ router.post("/AskForMoreInformation", (req, res) => {
         if(err) throw err;
     });
     //History
-    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: user_id, action: 'Ask for more information', desc: req.body.ticketDesc, staffName: name});
-    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
-        // If something went wrong, throw the error
-        if (err)
-            throw err;
-        // Else console log for reference that staff was assigned to a ticket by admin
-        console.log("Support Staff member just asked for more information.");
-    });
+    connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {date: new Date().toISOString(), staffId: user_id, action: 'Asked for more information', desc: "Staff requires more information from you ", staffName: name}}});
+    console.log("<PROCESS_MODIFIED>Support Staff member asked for more information about ticket.");
     res.json({status: 'success'});
 });
 router.post("/SuspendTicket", (req, res) => {
@@ -123,14 +119,9 @@ router.post("/SuspendTicket", (req, res) => {
         if(err) throw err;
     });
     //History
-    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: user_id, action: 'Ticket Suspended', desc: "Suspended by Staff", staffName: name});
-    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
-        // If something went wrong, throw the error
-        if (err)
-            throw err;
-        // Else console log for reference that staff was assigned to a ticket by admin
-        console.log("Support Staff member just suspended a ticket.");
-    });
+    connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {date: new Date().toISOString(), staffId: user_id, action: 'Suspend Ticket', desc: "Ticket Suspended by Staff member ", staffName: name}}});
+
+    console.log("<PROCESS_MODIFIED>Support Staff member suspended a ticket.");
     res.json({status: 'success'});
 });
 router.post("/CloseTicket", (req, res) => {
@@ -139,15 +130,10 @@ router.post("/CloseTicket", (req, res) => {
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 11}}, (err, res) => {
         if(err) throw err;
     });
-    //History
-    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: user_id, action: 'Ticket Closed', desc: "Closed by Staff member", staffName: name});
-    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
-        // If something went wrong, throw the error
-        if (err)
-            throw err;
-        // Else console log for reference that staff was assigned to a ticket by admin
-        console.log("Support Staff member just closed a ticket.");
-    });
+      //History
+      connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {staffId: user_id, action: 'Ticket Closed', desc: "Ticket Closed by Staff member ", staffName: name}}});
+
+      console.log("<PROCESS_MODIFIED>Support Staff member closed a ticket.");
     res.json({status: 'success'});
 });
 router.post("/CloseExpiredTicket", (req, res) => {
@@ -157,14 +143,9 @@ router.post("/CloseExpiredTicket", (req, res) => {
         if(err) throw err;
     });
     //History
-    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: user_id, action: 'Expired Ticket Closed', desc: "Closed by Staff member", staffName: name});
-    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
-        // If something went wrong, throw the error
-        if (err)
-            throw err;
-        // Else console log for reference that staff was assigned to a ticket by admin
-        console.log("Support Staff member just closed expired ticket.");
-    });
+    connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {date: new Date().toISOString(), staffId: user_id, action: 'Ticket Expired - Closed', desc: "Expired ticket closed by Staff member ", staffName: name}}});
+
+    console.log("<PROCESS_MODIFIED>Support Staff memberclosed expired ticket.");
     res.json({status: 'success'});
 });
 router.post("/CloseAbandonedTicket", (req, res) => {
@@ -173,32 +154,27 @@ router.post("/CloseAbandonedTicket", (req, res) => {
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 15}}, (err, res) => {
         if(err) throw err;
     });
+
     //History
-    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: user_id, action: 'Abandoned Ticket Closed', desc: "Closed by Staff member", staffName: name});
-    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
-        // If something went wrong, throw the error
-        if (err)
-            throw err;
-        // Else console log for reference that staff was assigned to a ticket by admin
-        console.log("Support Staff member just closed abandoned ticket.");
-    });
+    connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {date: new Date().toISOString(), staffId: user_id, action: 'Abandoned Ticket - Close', desc: "Abanoned Ticket was closed by Staff member ", staffName: name}}});
+
+    console.log("<PROCESS_MODIFIED>Support Staff member closed abandoned ticket.");
+
     res.json({status: 'success'});
 });
 router.post("/SolveTicket", (req, res) => {
     const name = req.cookies['name'];
     const user_id = req.cookies['user_id'];
+    
+    
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 7}}, (err, res) => {
         if(err) throw err;
     });
-    //History
-    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: user_id, action: 'Ticket Solved', desc: req.body.ticketDesc, staffName: name});
-    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
-        // If something went wrong, throw the error
-        if (err)
-            throw err;
-        // Else console log for reference that staff was assigned to a ticket by admin
-        console.log("Support Staff member just solved a ticket.");
-    });
+
+    //Creating history, creating object on the fly without schema as it DOES differ from every other previous request
+    connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {date: new Date().toISOString(), staffId: user_id, action: 'Ticket Solved', desc: "Ticket Solved by Staff member", staffName: name}}});
+
+    console.log("<PROCESS_MODIFIED>Staff just solved a ticket");
     res.json({status: 'success'});
 });
 router.post("/ReallocateTicket", (req, res) => {
@@ -208,26 +184,36 @@ router.post("/ReallocateTicket", (req, res) => {
         if(err) throw err;
     });
     //History
-    const newTicketHistory = new TicketHistory({ticketID: req.body.ticketID, staffId: user_id, action: 'Ticket Reallocated', desc: "Ticket Reallocated by Staff member", staffName: name});
-    connection.collection("ticketHistory").insertOne(newTicketHistory, function (err, res) {
-        // If something went wrong, throw the error
-        if (err)
-            throw err;
-        // Else console log for reference that staff was assigned to a ticket by admin
-        console.log("Support Staff member just reallocated a ticket.");
-    });
+    connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {staffId: user_id, action: 'Ticket Reallocated', desc: "Ticket Rellocated by Staff member ", staffName: name, date: new Date().toISOString()}}});
+    console.log("<PROCESS_MODIFIED>Support Staff member just reallocated a ticket.");
     res.json({status: 'success'});
 });
 router.post("/OpenTicketOnBehalf", (req, res) => {
+        // Ticket ID will be populated later
+        let ticketID_db;
         const username = req.cookies['username'];
+        const name = req.cookies['name'];
         const user_id = req.cookies['user_id'];
         const newTicket = new Ticket({ title: req.body.ticketTitle, ticketDesc: req.body.description, createdBy: req.body.onBehalf, createdById: user_id , currentSupportStaff: username, staffId: user_id, status: 2});
         connection.collection("tickets").insertOne(newTicket, function (err, res) {
             if (err)
                 throw err;
-            console.log("New Ticket was created by Support on Behalf of " + req.body.onBehalf);
-        });
+            // Assign the value of inserted ID to our variable
+            ticketID_db = res.insertedId;
+            console.log("<CREATION>New Ticket was created by Support on Behalf of " + req.body.onBehalf);
+            // Start after this
+            const newTicketHistory = new TicketHistory({ticketID: ticketID_db, records: {staffId: user_id, action: 'Ticket Created on Behalf', desc: "Ticket Created on Behalf of "+ req.body.onBehalf +" by Staff member", staffName: name, date: new Date().toISOString()}});
+            connection.collection("ticketHistory").insertOne(newTicketHistory);
+            console.log("<PROCESS_MODIFIED>New Ticket was created by Support on Behalf of " + req.body.onBehalf);
+        });   
         res.json({status: "ticket_created"})
+});
+router.post("/GetTicketHistory", (req, res) => {
+   // Get ticket history for the particular ticket
+   connection.collection("ticketHistory").findOne({ticketID: req.body.ticketID}, function(err, result) {
+    if (err) throw err;
+    res.json({history: result});
+  });
 });
 module.exports = router;
 
