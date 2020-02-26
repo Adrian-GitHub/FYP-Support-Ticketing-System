@@ -87,7 +87,14 @@
     transform: translate(-50%, -50%);
     text-align: center;
 }
-.centered>* {
+.centered-light {
+    position: relative;
+    top: 15vh;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+.centered>*, .centered-light>* {
    margin: 5px;
 }
 

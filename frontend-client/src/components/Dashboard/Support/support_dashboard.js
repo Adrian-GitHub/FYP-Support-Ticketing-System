@@ -12,7 +12,7 @@ class support_dashboard extends Component {
       render() {
         return (
             <div>
-                <Navi user={'hieee'}/>
+                <Navi user={document.cookie.replace(/(?:(?:^|.*;\s*)username\s*=\s*([^;]*).*$)|^.*$/, "$1") + "(" + document.cookie.replace(/(?:(?:^|.*;\s*)name\s*=\s*([^;]*).*$)|^.*$/, "$1") + ")"}/>
                 <Dashboard />
             </div>
         );

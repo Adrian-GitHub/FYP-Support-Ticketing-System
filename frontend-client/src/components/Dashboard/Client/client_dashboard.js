@@ -12,7 +12,7 @@ class client_dashboard extends Component {
       render() {
         return (
             <div>
-                <Navi user={'hieee'}/>
+                <Navi user={document.cookie.replace(/(?:(?:^|.*;\s*)name\s*=\s*([^;]*).*$)|^.*$/, "$1")}/>
                 <Dashboard />
             </div>
         );

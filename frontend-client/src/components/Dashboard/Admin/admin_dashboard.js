@@ -57,7 +57,7 @@ class admin_dashboard extends Component {
         return (
             <div>
                 <Navi />
-                <WelcomeHeader name={"admin_the_boss"}/>
+                <WelcomeHeader name={document.cookie.replace(/(?:(?:^|.*;\s*)name\s*=\s*([^;]*).*$)|^.*$/, "$1")}/>
                 <Statistics ticketData={ticketData} user={userCount} staff={staffCount} />
                 <TicketList data={ticketData} />
             </div>

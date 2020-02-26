@@ -13,7 +13,7 @@ class Navi extends React.Component {
       })
     }
     hideModal = (e) => {
-      this.setState({TicketOnBehalf: false});
+      this.setState({ticketOnBehalf: false});
     }
     render(){
       const { ticketOnBehalf } = this.state;

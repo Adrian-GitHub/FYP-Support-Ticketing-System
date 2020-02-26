@@ -22,7 +22,7 @@ class Dashboard extends Component {
         this.state = ({
             tickets: data,
             availableTickets: data,
-            currentItem: {title: '', desc: '', dateCreated: '', staff: '', status: ''}
+            currentItem: {title: '', desc: '', dateCreated: '', staff: '', status: ''},
         })
     }
     // When component is "loaded", fetch ticket data corresponding to this user
