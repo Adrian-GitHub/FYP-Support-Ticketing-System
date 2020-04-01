@@ -71,7 +71,7 @@ class newTicket extends Component {
                 <Input id="ticketDesc" prefix={<Icon type="book" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Description of a ticket" onChange={this.onChange}/>
                 </Form.Item>
                 <Form.Item wrapperCol={{ span: 12, offset: 5 }}>
-                <Button type="primary" htmlType="submit">
+                <Button type="primary" htmlType="submit" id="test-submit">
                     Submit
                 </Button>
                 </Form.Item>

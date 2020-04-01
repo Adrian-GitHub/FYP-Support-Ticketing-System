@@ -16,7 +16,8 @@ import Admin_Dashboard from "./components/Dashboard/Admin/admin_dashboard";
 import Support_Dashboard from "./components/Dashboard/Support/support_dashboard";
 import Client_Dashboard from "./components/Dashboard/Client/client_dashboard";
 // Profile Screens
-import Client_Profile from "./components/Dashboard/Client/ui/AccountSettings"
+import Client_Profile from "./components/Dashboard/Client/ui/AccountSettings";
+
 class App extends Component {
     render() {
         return (

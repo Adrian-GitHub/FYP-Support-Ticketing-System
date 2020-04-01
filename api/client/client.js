@@ -4,6 +4,7 @@ const router = express.Router();
 const User = require("../../database/models/User_Account");
 // For ticket creation
 const Ticket = require("../../database/models/Ticket_Process");
+const TicketHistory = require("../../database/models/Ticket_History");
 // MongoDB
 var MongoClient = require('../../database/config/DatabaseConnection');
 var connection = MongoClient.getDb();
@@ -63,7 +64,7 @@ router.post("/CreateTicket", (req, res) => {
         ticketID = res.insertedId;
     });
     const newTicketHistory = new TicketHistory({ticketID: ticketID, staffId: user_id, action: 'Ticket Created', desc: "Ticket Created by " + name, staffName: 'CLIENT'});
-    onnection.collection("ticketHistory").updateOne({ticketID: ObjectId(ticketID)},{"$push":{record: {newTicketHistory}}});
+    connection.collection("ticketHistory").updateOne({ticketID: ObjectId(ticketID)},{"$push":{record: {newTicketHistory}}});
     console.log("<PROCESS_MODIFIED>New Ticket was created by Client");
     return res.json({status: "success"})
 });

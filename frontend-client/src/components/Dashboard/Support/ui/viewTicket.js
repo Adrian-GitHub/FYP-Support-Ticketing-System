@@ -71,7 +71,7 @@ class ViewTicket extends Component {
             <div className="button-toolbar centered-light">
                 <Button onClick={() => askForMoreInformation(this.props.ticket.id) }>ASK FOR MORE INFORMATION</Button>
                 <Button onClick={() => suspendTicket(this.props.ticket.id)}>SUSPEND TICKET</Button>
-                <Button onClick={() => closeTicket(this.props.ticket.id)}>CLOSE TICKET</Button>
+                <Button id="closeTicket" onClick={() => closeTicket(this.props.ticket.id)}>CLOSE TICKET</Button>
                 <Button onClick={() => closeExpiredTicket(this.props.ticket.id)}>CLOSE EXPIRED TICKET</Button>
                 <Button onClick={() => closeAbandonedTicket(this.props.ticket.id)}>CLOSE ABANONDED TICKET</Button>
                 <Button onClick={() => solveTicket(this.props.ticket.id)}>SOLVE TICKET</Button>
