@@ -1,18 +1,20 @@
-# Sequence Diagrams for support-ticketing-system
+# FYP-Support-Ticketing-System
 
-## Get Started
-1. launch the server
-	```
-	npm start
-	```
+MONGODB setup
+1. `DOWNLOAD MONGO FROM `https://www.mongodb.com/download-center/community `CHOOSE SERVER`
+2. `PICK YOUR SYSTEM AND LATEST VERSION`
+3. WINDOWS ONLY SCRIPT: `"path\to\MongoDBServer\bin\mongod.exe" --dbpath "path\to\MongoDBServer\data\db"
+# FILES
 
-2. open the webpage [http://localhost:8030/]()
+0. Make sure MONGODB is running
 
-3. modify ``/data/app.txt``
+1. `npm install`
+2. `cd frontend-client`
+3. `npm install`
+4. `cd ../`
+5. `npm run both`
 
 
-## Syntax
-[![](https://bramp.github.io/js-sequence-diagrams/images/grammar.png)](https://bramp.github.io/js-sequence-diagrams/#syntax)
 
-## License 
-the MIT License
+# THE GIF
+https://adrx.me/gifferrinoo_encryptado.gif
