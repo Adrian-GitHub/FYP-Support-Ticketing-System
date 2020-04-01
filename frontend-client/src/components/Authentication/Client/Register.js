@@ -58,7 +58,7 @@ class Registration extends Component {
                     <Form.Label>Retype Password</Form.Label>
                     <Form.Control onChange={this.onChange} value={this.state.retypedPassword} minLength="3" name="retypedPassword" placeholder="Minimum 3 characters long" required type="password"/>
                 </Form.Group>
-                <Button block size="lg" name="register" type="submit">Register</Button>
+                <Button block size="lg" type="submit">Register</Button>
             </Form>
            
         </div>

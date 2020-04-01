@@ -54,7 +54,7 @@ class Dashboard extends Component {
                     dataSource={this.state.tickets}
                     renderItem={item => (
                         <List.Item onClick={() => this.saveTicketInstance_open(item)} className="item">
-                            <div className={'t ' + item.title}>
+                            <div>
                                 <h5>{item.title}</h5>
                                 <p>{item.desc}</p>
                                 <div className="toolbar">
@@ -84,7 +84,7 @@ class Dashboard extends Component {
                     dataSource={this.state.availableTickets}
                     renderItem={item => (
                         <List.Item onClick={() => this.saveTicketInstance_save(item)} className="item">
-                            <div className={item.title}>
+                            <div>
                                 <h5>{item.title}</h5>
                                 <p>{item.desc}</p>
                                 <div className="toolbar" style={{display: 'block'}}>

@@ -7,7 +7,7 @@ export function closeTicket(props) {
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Close'
+        confirmButtonText: 'Ask'
     }).then((result) => {
         if (!result.dismiss) {
             fetch('/api/support/CloseTicket', {

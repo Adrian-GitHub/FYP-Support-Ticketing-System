@@ -212,7 +212,6 @@ router.post("/GetTicketHistory", (req, res) => {
    // Get ticket history for the particular ticket
    connection.collection("ticketHistory").findOne({ticketID: req.body.ticketID}, function(err, result) {
     if (err) throw err;
-    console.log(result)
     res.json({history: result});
   });
 });
