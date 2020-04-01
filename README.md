@@ -15,6 +15,12 @@ MONGODB setup
 5. `npm run both`
 
 
+selenium setup
 
-# THE GIF
-https://adrx.me/gifferrinoo_encryptado.gif
+1.create folder on C drive, call it SELENIUM
+2. put the downloaded driver into that folder
+3. go to system variables
+4. go to environment variables
+5. click on PATH then EDIT then NEW then add C:\Selenium
+6. now to see if it works, go to CMD and type start chromedriver
+7. it should start the chrome driver
