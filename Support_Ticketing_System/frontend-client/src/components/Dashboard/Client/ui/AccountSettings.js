@@ -22,7 +22,6 @@ class AccountSettings extends Component {
     }    
     componentDidMount(){
         //FETCH ALMOST FULL USER ACCOUNT DATA
-           //Create a ticket
            fetch('/api/client/GetUserData', {
             method: 'POST',
             headers: {
@@ -40,13 +39,11 @@ class AccountSettings extends Component {
               }
               else {              
                 //update state
-                let formattedData = data[0];
-                formattedData.registrationDate = new Date(formattedData.registrationDate).toLocaleString();
-                this.setState({userData: data[0]});
+                this.setState({userData: data.userData[0], ticketCount: data.ticketData});
               }
           }).catch((error) => {
             console.log(error);
-          });
+          });        
     }
     async changePassword(){
         const { value: pwd } = await Swal.fire({
@@ -123,8 +120,8 @@ class AccountSettings extends Component {
             <span>This is the data we hold about you</span>
             <div className="userData">
                 <span>Your username: <span>{this.state.userData.username}</span></span>
-                <span style={{display: 'block'}}>You are with us since:<span>{this.state.userData.registrationDate}</span></span>
-                <span style={{display: 'block'}}>You have submitted: <span style={{fontWeight: 'bolder'}}> {this.state.userData.amountOfTickets}</span> amount of tickets</span>
+                <span style={{display: 'block'}}>You are with us since:<span> {new Date(this.state.userData.registrationDate).toLocaleString()}</span></span>
+                <span style={{display: 'block'}}>You have submitted: <span style={{fontWeight: 'bolder'}}> {this.state.ticketCount}</span> tickets</span>
                 <span style={{display: 'block'}}>THESE ARE YOUR OPTIONS</span>
                 <div className="buttonToolbar-AS">
                     <Button size="large" variant="warning" onClick={() => this.changePassword()} >CHANGE PASSWORD</Button>

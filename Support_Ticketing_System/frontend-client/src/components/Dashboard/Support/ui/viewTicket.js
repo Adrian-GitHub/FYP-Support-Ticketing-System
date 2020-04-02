@@ -1,4 +1,4 @@
-import { Badge, Divider, List, Comment } from 'antd';
+import { Badge, Divider, List } from 'antd';
 import React, { Component } from 'react';
 import {withRouter} from 'react-router-dom';
 import {Button} from 'react-bootstrap'
@@ -18,7 +18,8 @@ class ViewTicket extends Component {
           action: 'LOADING',
           desc: 'ALMOST THERE',
           staffName: 'SYSTEM',
-          date: 'JUST NOW'
+          date: 'JUST NOW',
+          message: 'X'
         }]
       });
     }
@@ -44,7 +45,8 @@ class ViewTicket extends Component {
                 action: element.action,
                 desc: element.desc,
                 staffName: element.staffName,
-                date: date
+                date: date,
+                message: element.message
               })
           });
           this.setState({ticketHistory: dbData});
@@ -69,13 +71,13 @@ class ViewTicket extends Component {
             <span style={{textAlign: 'center', display: 'block'}}>The status of the ticket is : <Badge count={this.props.ticket.status} style={{ backgroundColor: '#52c41a' }} /></span>
             <span>This ticket was created by: {this.props.ticket.createdBy} </span>
             <div className="button-toolbar centered-light">
-                <Button onClick={() => askForMoreInformation(this.props.ticket.id) }>ASK FOR MORE INFORMATION</Button>
-                <Button onClick={() => suspendTicket(this.props.ticket.id)}>SUSPEND TICKET</Button>
+                <Button id="ask4moInfo" onClick={() => askForMoreInformation(this.props.ticket.id) }>ASK FOR MORE INFORMATION</Button>
+                <Button id="suspendTicket" onClick={() => suspendTicket(this.props.ticket.id)}>SUSPEND TICKET</Button>
                 <Button id="closeTicket" onClick={() => closeTicket(this.props.ticket.id)}>CLOSE TICKET</Button>
-                <Button onClick={() => closeExpiredTicket(this.props.ticket.id)}>CLOSE EXPIRED TICKET</Button>
-                <Button onClick={() => closeAbandonedTicket(this.props.ticket.id)}>CLOSE ABANONDED TICKET</Button>
-                <Button onClick={() => solveTicket(this.props.ticket.id)}>SOLVE TICKET</Button>
-                <Button onClick={() => reallocateTicket(this.props.ticket.id)}>REALLOCATE TICKET</Button>
+                <Button id="closeExpiredTicket" onClick={() => closeExpiredTicket(this.props.ticket.id)}>CLOSE EXPIRED TICKET</Button>
+                <Button id="closeAbdTicket" onClick={() => closeAbandonedTicket(this.props.ticket.id)}>CLOSE ABANONDED TICKET</Button>
+                <Button id="solveTicket" onClick={() => solveTicket(this.props.ticket.id)}>SOLVE TICKET</Button>
+                <Button id="reallocTicket" onClick={() => reallocateTicket(this.props.ticket.id)}>REALLOCATE TICKET</Button>
             </div>
             </div>
             </div>

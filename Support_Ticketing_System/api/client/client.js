@@ -62,10 +62,10 @@ router.post("/CreateTicket", (req, res) => {
         console.log("New Ticket was created by Client " + username);
         // Assign the value of inserted ID to our variable
         ticketID = res.insertedId;
-    });
-    const newTicketHistory = new TicketHistory({ticketID: ticketID, staffId: user_id, action: 'Ticket Created', desc: "Ticket Created by " + name, staffName: 'CLIENT'});
-    connection.collection("ticketHistory").updateOne({ticketID: ObjectId(ticketID)},{"$push":{record: {newTicketHistory}}});
-    console.log("<PROCESS_MODIFIED>New Ticket was created by Client");
+        const newTicketHistory = new TicketHistory({ticketID: ticketID, records: {staffId: user_id, action: 'Ticket Created by the CLIENT', desc: "Created by "+ username +" (CLIENT)", staffName: "CLIENT", date: new Date().toISOString()}});
+        connection.collection("ticketHistory").insertOne(newTicketHistory);
+        console.log("<PROCESS_MODIFIED>New Ticket was created by Client");
+    });   
     return res.json({status: "success"})
 });
 // Get All Tickets belonging to this user
@@ -76,6 +76,7 @@ router.post("/GetTickets", (req, res) => {
     {
         //User is not authed properly then
         res.json({status: 'not_authed'});
+        return;
     }
     var cursor = connection.collection('tickets').find();
     // Construct that Data into the object
@@ -104,11 +105,28 @@ router.post("/GetUserData", (req, res) => {
     const username = req.cookies['username'];
     //If username doesn't exist that means that user wasn't logged in. 
     if(!username) {res.json({status: 'error'});}
+    // Get ticket count
+    const newCursor = connection.collection('tickets').find();
+    let ticketCount = 0;
+    // Execute the each command, triggers for each document
+    newCursor.forEach(function(doc) {
+         // If the item is null then the cursor is empty
+         if(doc == null) {
+            //quit
+            return;
+        }
+        // Only current user's tickets
+        if(doc.createdBy === username){
+            // add it to the count
+            ticketCount++;
+            return; 
+        }
+    });
     // Else , proceeding fetching data from DB. We will skip password, salt as there's no need for it
    connection.collection('users').findOne({'username': username}, {projection: {password: 0, salt: 0, _id: 0}}).then(function(doc){
         userData.push(doc);
         //Send it back to the user
-        res.json(userData);
+        res.json({userData: userData, ticketData: ticketCount });
     });
 });
 router.post("/ChangePassword", (req, res) => {
@@ -142,13 +160,15 @@ router.post("/CloseTicket", (req, res) => {
     });
     res.json({status: 'success'});
 });
-/*
-// if req.body.notes is defined. Insert these NOTES into the file's item
-  if(req.body.notes){
-    // Creating object on the fly as it's simple and values already be defined as we reached the verification steps before
-    connection.collection("files").updateOne({_id: ObjectId(req.body._id)},{"$push":{notes: {author: req.cookies.username, note: req.body.notes,  dateUpdated: new Date().toISOString()}}});
-  }
+router.post("/SubmitMoreInformation", (req, res) => {
+    // Ticket ID and Message are passed into here
+    const ticketID = req.body.id;
+    const message = req.body.message;
+    if(ticketID){
+      connection.collection("ticketHistory").updateOne({"ticketID": ticketID},{"$push":{records: {date: new Date().toISOString(), staffId: 'CLIENT', action: 'MORE INFORMATION ADDED', desc: message , staffName: 'CLIENT'}}});
+      res.json({status: 'success'});
+    }
+});
 
-*/
 module.exports = router;
 

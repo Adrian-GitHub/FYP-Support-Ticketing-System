@@ -96,6 +96,40 @@ class Dashboard extends Component {
             }
           })        
     }
+    submitMoreInformation(){
+        Swal.fire({
+            title: 'Submitting more information',
+            text: "Please elaborate on your problem here.",
+            icon: 'question',
+            input: 'text',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'You need to write something!';
+                }
+            },
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Submit'
+          }).then((result) => {
+            if (result.value) {
+                fetch('/api/client/SubmitMoreInformation', {
+                    method: 'POST',
+                    body: JSON.stringify({id: this.state.currentItem.id, message: result.value}),
+                    headers: {
+                      "Content-Type": "application/json"
+                    }
+                  }).then((res) => res.json()).then((data) => {
+                     if(data.status === 'success'){
+                         Swal.fire('Success!', 'Information submitted.', 'success');
+                         window.location.reload();
+                     }
+                  }).catch((error) => {
+                    console.log(error);
+                  });                
+            }
+          })        
+    }
     viewTicket(item){
         this.setState({currentItem: item})
     }
@@ -155,7 +189,7 @@ class Dashboard extends Component {
                             />
                         </div>
                         <div className="button-toolbar centered">
-                            <Button>SUBMIT MORE INFORMATION(voluntary)</Button>
+                            <Button onClick={() => this.submitMoreInformation()}>SUBMIT MORE INFORMATION</Button>
                             {cancellation ? <Button variant="danger" onClick={() => this.closeTicket()}>CLOSE TICKET</Button> : null }
                         </div>
                     </div>

@@ -25,7 +25,7 @@ class Navi extends React.Component {
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="mr-auto">
               <Nav.Link onClick={() => this.setState({ticketOnBehalf: true})}>Open Ticket on Behalf</Nav.Link>
-              <Nav.Link onClick={() => Logout(this.props)}>Logout</Nav.Link>
+              <Nav.Link name="test-logout" onClick={() => Logout(this.props)}>Logout</Nav.Link>
               <Nav.Link style={{pointerEvents: 'none', position: 'absolute', right: '25px', color: '#ffffff', fontWeight: 'bolder'}}>Welcome Staf Member: {this.props.user}</Nav.Link>
             </Nav>
           </Navbar.Collapse>

@@ -10,6 +10,7 @@ import Statistics from './ui/Stats';
 import TicketList from './ui/TicketList';
 
 import 'antd/dist/antd.css'; 
+import Swal from 'sweetalert2';
 
 // Array for ticket data
 const ticketData = [];
@@ -28,31 +29,39 @@ class admin_dashboard extends Component {
             headers: {
                 "Content-Type": "application/json"
             }}).then((res) => res.json()).then((data) => { // make response data accessible by dot notation
-              // Assign the returned response into our state object
-              const returnedData = data.files;
-
-              userCount = data.userCount;
-              staffCount = data.staffCount;
-
-              returnedData.forEach(element => {
-                const date = new Date(element.creationDate).toLocaleString();
-                ticketData.push({
-                  id: element._id,
-                  title: element.title,
-                  createdBy: element.createdBy,
-                  creationDate: date,
-                  desc: element.desc,
-                  currentStaff: element.currentSupportStaff,
-                  stage: element.stage,
-                  status: element.status
+              // Security check 
+              if(data.files === 'error'){
+                // Redirect
+                this.props.history.push("/Login");
+                Swal.fire('ERROR', 'Sorry, you aren\'t allowed to see this', 'error');
+              }
+              else{
+                // Assign the returned response into our state object
+                const returnedData = data.files;
+                
+                userCount = data.userCount;
+                staffCount = data.staffCount;
+                
+                returnedData.forEach(element => {
+                  const date = new Date(element.creationDate).toLocaleString();
+                  ticketData.push({
+                    id: element._id,
+                    title: element.title,
+                    createdBy: element.createdBy,
+                    creationDate: date,
+                    desc: element.desc,
+                    currentStaff: element.currentSupportStaff,
+                    stage: element.stage,
+                    status: element.status
+                  });
+                  // Refresh
+                  this.setState({ update: true });
                 });
-                // Refresh
-                this.setState({ update: true });
-              });
-            }).catch((error) => {
+              }
+              }).catch((error) => {
                 console.log(error);
-            });    
-      }
+              });    
+            }
       render() {
         return (
             <div>

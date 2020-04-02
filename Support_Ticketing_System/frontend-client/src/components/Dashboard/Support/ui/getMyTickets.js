@@ -11,14 +11,21 @@ export async function getMyTickets() {
         }
     })
     const data = await res.json();
-    
     if (data.status === 'not_authed') {
             notification.open({
                 message: 'Error!',
                 description: 'You must be logged in to access that data.',
                 icon: <Icon type="warning" style={{ color: '#ff0000' }} />,
             });
-            this.props.history.push("/Login");
+          return 'error';
+    }
+    if(data.level === 'nope'){
+        notification.open({
+            message: 'Error!',
+            description: 'You must be logged in to access that data.',
+            icon: <Icon type="warning" style={{ color: '#ff0000' }} />,
+        });
+        return 'error';
     }
     else if (data.status === 'success') {
             //temp var

@@ -1,4 +1,4 @@
-const {Builder, By, Key, ExpectedConditions , until} = require('selenium-webdriver');
+const {Builder, By, Key, until} = require('selenium-webdriver');
  
 (async function example() {
   let driver = await new Builder().forBrowser('chrome').build();
@@ -44,7 +44,7 @@ const {Builder, By, Key, ExpectedConditions , until} = require('selenium-webdriv
     // Now, repeat the steps. We want to have another ticket created too
     await (await driver.findElement(By.linkText('New Ticket'))).click();
     // Fill in the title then description
-    await driver.findElement(By.id('ticketTitle')).sendKeys('Ticket for Jane 2');
+    await driver.findElement(By.id('ticketTitle')).sendKeys('Ticket for Hallam');
     await driver.findElement(By.id('ticketDesc')).sendKeys('Fantabolous description of my problem including the extraoridnary description of the ticket');
     // Click the submit button
     await (await driver.findElement(By.id('test-submit'))).click();
@@ -59,6 +59,7 @@ const {Builder, By, Key, ExpectedConditions , until} = require('selenium-webdriv
     await (await driver.findElement(By.className('swal2-confirm swal2-styled'))).click();
     // Now we should be at the login site
     await driver.wait(until.urlIs('http://localhost:3000/Login'), 1700);
+    await driver.sleep(300);
     // Go back to default one so support test is ready to start
     await (await driver.findElement(By.className('goBack'))).click();
 
@@ -78,8 +79,8 @@ const {Builder, By, Key, ExpectedConditions , until} = require('selenium-webdriv
     await driver.findElement(By.name('password')).sendKeys('password_jane', Key.RETURN);
     await driver.findElement(By.name('retypedPassword')).sendKeys('password_jane', Key.RETURN);
     // Last enter sent the data to the server, now we should be at the Login page
-    // Waiting up to 3 seconds as database might taken longer than a usual of 1045ms.
-    await driver.sleep(5000);
+    // Waiting up to 1.3 seconds as database might taken longer than a usual of 1045ms.
+    await driver.sleep(1300);
     await driver.wait(until.urlIs('http://localhost:3000/login'), 700);
     // Fill in the username and password details
     await driver.findElement(By.name('username')).sendKeys('support_jane', Key.RETURN);
@@ -108,7 +109,32 @@ const {Builder, By, Key, ExpectedConditions , until} = require('selenium-webdriv
     // Press ok to confirm it
     await driver.sleep(200);
     await (await driver.findElement(By.className('swal2-confirm swal2-styled'))).click();
+    //
+    // Ticket number 2
+    //
+    await driver.sleep(400);
+    await (await driver.findElement(By.className('Ticket for Hallam'))).click();
+    // Now, confirm that we want to take that ticket but wait half a second
+    await driver.sleep(500);
+    await (await driver.findElement(By.className('swal2-confirm swal2-styled'))).click();
+    // Repeat the steps to press OK button
+    await driver.sleep(500);
+    await (await driver.findElement(By.className('swal2-confirm swal2-styled'))).click();
+    // Now ticket is in our inventory
+    await (await driver.findElement(By.className('t Ticket for Hallam'))).click();
+    await driver.sleep(300);
+    // Now click the CLOSE Ticket button
+    await (await driver.findElement(By.id('solveTicket'))).click();
+    // Put the reason into the field
+    await driver.findElement(By.className('swal2-input')).sendKeys('TEST AUTOMATION COMPLETE STAGE 2/2');
+    // Press ok to confirm it
+    await driver.sleep(200);
+    await (await driver.findElement(By.className('swal2-confirm swal2-styled'))).click();
+    // Now Logout
+    await driver.sleep(100);
+    await (await driver.findElement(By.name('test-logout'))).click();
   } finally {
-    //await driver.quit();
+    // Close it
+    await driver.quit();
   }
 })();

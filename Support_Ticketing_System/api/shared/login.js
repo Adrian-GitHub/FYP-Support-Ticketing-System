@@ -33,6 +33,7 @@ router.post("/Login", (req, res) => { // Form validation
                    //Set the token into httpOnly cookie
                    //httpOnly cookie is not accessible via JS
                    res.cookie('authenticated_user', token , { expires: new Date(Date.now() + 3600000), httpOnly: true })
+                   res.cookie('privilaged_user', user.isWho , { expires: new Date(Date.now() + 3600000), httpOnly: true })
                    // A normal cookie, containing userID
                    res.cookie('user_id', user._id);
                    res.cookie('name', user.name);

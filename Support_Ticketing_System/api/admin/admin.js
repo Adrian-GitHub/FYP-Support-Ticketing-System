@@ -68,45 +68,55 @@ router.post("/NewTicket", (req, res) => { // Create new ticket with all data bei
 
 // Get all tickets from DB
 router.post("/GetStats", (req, res) => {
-    var cursor = connection.collection('tickets').find();
-    // Construct that Data into the object
-    const ticketData = [];
-    // Execute the each command, triggers for each document
-    cursor.forEach(function(doc) {
-         // If the item is null then the cursor is empty
-         if(doc == null) {
-            //quit
-            return;
-        }
-          // otherwise, do something with the item
-          ticketData.push(doc);
-      }, function(err) {/* just catch the error, no need to do anything with is as we continue with the work */ });
-      const newCursor = connection.collection('users').find();
-      // Counters
-      let userCount = 0, staffCount = 0;
-      // Execute the each command, triggers for each document
-      newCursor.forEach(function(doc) {
-           // If the item is null then the cursor is empty
-           if(doc == null) {
-              //quit
-              return;
-          }
-          // We're not interested in admin data
-          if(doc.isWho === "admin"){
-              // skip current iteration
-              return; 
-          }
-          else if(doc.isWho === "support"){
+    /*
+        VERIFY IF ADMIN BEFORE PROCEEDING
+    */
+    const isAdmin = req.cookies['privilaged_user'];
+    if(isAdmin !== 'admin'){
+        res.json({files: 'error'});
+        return;
+    }       
+    else if (isAdmin === 'admin'){
+        var cursor = connection.collection('tickets').find();
+        // Construct that Data into the object
+        const ticketData = [];
+        // Execute the each command, triggers for each document
+        cursor.forEach(function(doc) {
+            // If the item is null then the cursor is empty
+            if(doc == null) {
+                //quit
+                return;
+            }
+            // otherwise, do something with the item
+            ticketData.push(doc);
+        }, function(err) {/* just catch the error, no need to do anything with is as we continue with the work */ });
+        const newCursor = connection.collection('users').find();
+        // Counters
+        let userCount = 0, staffCount = 0;
+        // Execute the each command, triggers for each document
+        newCursor.forEach(function(doc) {
+            // If the item is null then the cursor is empty
+            if(doc == null) {
+                //quit
+                return;
+            }
+            // We're not interested in admin data
+            if(doc.isWho === "admin"){
+                // skip current iteration
+                return; 
+            }
+            else if(doc.isWho === "support"){
                 staffCount++;
-          }
-          else if(doc.isWho === "client"){
+            }
+            else if(doc.isWho === "client"){
                 userCount++;
-          }
+            }
         }, function(err) {
-          // done by error, when error occurs that means all data was read
-          // Send constructed JSON from MongoDB data via RES to the frontend
-          res.json({files: ticketData , userCount: userCount, staffCount: staffCount})
+            // done by error, when error occurs that means all data was read
+            // Send constructed JSON from MongoDB data via RES to the frontend
+            res.json({files: ticketData , userCount: userCount, staffCount: staffCount})
         });
+    }  
 });
 router.post('/StaffDetails', (req,res) => {
     // Create a link to DB for the users tab

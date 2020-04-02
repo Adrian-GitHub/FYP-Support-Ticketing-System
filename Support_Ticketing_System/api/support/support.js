@@ -44,10 +44,16 @@ function hashPassword(password, salt){
 router.post("/GetMyTickets", (req, res) => {
     const username = req.cookies['username'];
     const user_id = req.cookies['user_id'];
+    const isSupport = req.cookies['privilaged_user'];
     if(!username)// if username is not defined
     {
         //User is not authed properly then
         res.json({status: 'not_authed'});
+        return;
+    }
+    if(isSupport !== 'support' && isSupport !== 'admin'){
+        res.json({level: 'nope'});
+        return;
     }
     var cursor = connection.collection('tickets').find();
     // Construct that Data into the object
@@ -131,7 +137,7 @@ router.post("/CloseTicket", (req, res) => {
         if(err) throw err;
     });
       //History
-      connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {staffId: user_id, action: 'Ticket Closed', desc: "Ticket Closed by Staff member ", staffName: name}}});
+      connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {date: new Date().toISOString(), staffId: user_id, action: 'Ticket Closed', desc: "Ticket Closed by Staff member ", staffName: name}}});
 
       console.log("<PROCESS_MODIFIED>Support Staff member closed a ticket.");
     res.json({status: 'success'});
@@ -194,7 +200,7 @@ router.post("/OpenTicketOnBehalf", (req, res) => {
         const username = req.cookies['username'];
         const name = req.cookies['name'];
         const user_id = req.cookies['user_id'];
-        const newTicket = new Ticket({ title: req.body.ticketTitle, ticketDesc: req.body.description, createdBy: req.body.onBehalf, createdById: user_id , currentSupportStaff: username, staffId: user_id, status: 2});
+        const newTicket = new Ticket({ title: req.body.ticketTitle, desc: req.body.description, createdBy: req.body.onBehalf, createdById: user_id , currentSupportStaff: username, staffId: user_id, status: 2});
         connection.collection("tickets").insertOne(newTicket, function (err, res) {
             if (err)
                 throw err;
@@ -212,7 +218,6 @@ router.post("/GetTicketHistory", (req, res) => {
    // Get ticket history for the particular ticket
    connection.collection("ticketHistory").findOne({ticketID: req.body.ticketID}, function(err, result) {
     if (err) throw err;
-    console.log(result)
     res.json({history: result});
   });
 });

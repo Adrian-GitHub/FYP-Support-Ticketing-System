@@ -28,6 +28,9 @@ class Dashboard extends Component {
     // When component is "loaded", fetch ticket data corresponding to this user
     async componentDidMount(){
         const myTickets = await getMyTickets();
+        if(myTickets === 'error'){
+            this.props.history.push("/Login");
+        }
         this.setState({ tickets: myTickets})
         const availableTickets = await getAvailableTickets();
         this.setState({ availableTickets: availableTickets});
