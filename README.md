@@ -15,7 +15,7 @@ MONGODB setup
 5. `npm run both`
 
 
-selenium setup
+# Selenium setup
 
 1. `Create folder on C drive, call it Selenium`
 2. `Put the downloaded driver into that folder`
