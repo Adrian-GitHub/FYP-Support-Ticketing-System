@@ -17,10 +17,10 @@ MONGODB setup
 
 selenium setup
 
-1.create folder on C drive, call it SELENIUM
-2. put the downloaded driver into that folder
-3. go to system variables
-4. go to environment variables
-5. click on PATH then EDIT then NEW then add C:\Selenium
-6. now to see if it works, go to CMD and type start chromedriver
-7. it should start the chrome driver
+1. `Create folder on C drive, call it Selenium`
+2. `Put the downloaded driver into that folder`
+3. `Go to system variables`
+4. `Go to environment variables`
+5. `Click on PATH then EDIT then NEW then add C:\Selenium`
+6. `Now to see if it works, go to CMD and type start chromedriver`
+7. `It should start the chrome driver`
