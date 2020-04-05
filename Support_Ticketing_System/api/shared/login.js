@@ -15,7 +15,7 @@ function hashPassword(password, salt){
                        throw err;
                }).toString('hex')
 }
-router.post("/Login", (req, res) => { // Form validation
+const Login = (req, res) => { // Form validation
    const username = req.body.username;
    const password = req.body.password;
        //first find the salt that was used to generate user's password
@@ -48,14 +48,17 @@ router.post("/Login", (req, res) => { // Form validation
                res.json({status: "Not_Authed"});
            }
        });
-});
+};
 //Logout user
-router.post("/Logout", (req, res) => {
+const Logout = (req, res) => {
     //Clearing all cookies created by us
     res.clearCookie("authenticated_user");
     res.clearCookie("username");
     res.clearCookie("name");
     res.clearCookie("user_id");
     res.json({status: "success"})
-});
+};
+
 module.exports = router;
+module.exports.Login = Login;
+module.exports.Logout = Logout;

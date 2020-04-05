@@ -11,7 +11,7 @@ const ObjectId = require('mongodb').ObjectId;
 const crypto = require('crypto');
 
 // Register route
-router.post("/Register", (req, res) => { // Form validation
+const Register = (req, res) => { // Form validation
         connection.collection('users').findOne({ username: req.body.username }).then(user => {
             if (user) {
                 return res.json({ username: "Username_taken" });
@@ -34,14 +34,14 @@ router.post("/Register", (req, res) => { // Form validation
                 return res.json({ username: "Username is free" });
             };
         });
-});
+};
 function hashPassword(password, salt){
      return hashedPassword = crypto.pbkdf2Sync(password, salt, 100000, 512, 'sha512', (err, key) => {
                     if (err)
                         throw err;
                 }).toString('hex')
 };
-router.post("/GetMyTickets", (req, res) => {
+const GetMyTickets = (req, res) => {
     const username = req.cookies['username'];
     const user_id = req.cookies['user_id'];
     const isSupport = req.cookies['privilaged_user'];
@@ -75,8 +75,8 @@ router.post("/GetMyTickets", (req, res) => {
           //done by error
           res.json({status: 'success', tickets: ticketData})
       });
-});
-router.post("/GetAvailableTickets", (req, res) => {
+};
+const GetAvailableTickets = (req, res) => {
     var cursor = connection.collection('tickets').find();
     // Construct that Data into the object
     const ticketData = [];
@@ -96,8 +96,8 @@ router.post("/GetAvailableTickets", (req, res) => {
           //done by error
           res.json({status: 'success', tickets: ticketData})
       });
-});
-router.post("/ClaimTicket", (req, res) => {
+};
+const ClaimTicket = (req, res) => {
     const name = req.cookies['name'];
     const user_id = req.cookies['user_id'];
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"currentSupportStaff": name, "staffId": user_id}}, (err, res) => {
@@ -106,8 +106,8 @@ router.post("/ClaimTicket", (req, res) => {
     connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {staffId: user_id, action: 'Ticket Claimed', desc: "Ticket was claimed by ", staffName: name, date: new Date().toISOString()}}});
     console.log("<PROCESS_MODIFIED>Support Staff claimed a ticket for themselves.");
     res.json({status: 'success'});
-});
-router.post("/AskForMoreInformation", (req, res) => {
+};
+const AskForMoreInformation = (req, res) => {
     const name = req.cookies['name'];
     const user_id = req.cookies['user_id'];
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 10}}, (err, res) => {
@@ -117,8 +117,8 @@ router.post("/AskForMoreInformation", (req, res) => {
     connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {date: new Date().toISOString(), staffId: user_id, action: 'Asked for more information', desc: "Staff requires more information from you ", staffName: name}}});
     console.log("<PROCESS_MODIFIED>Support Staff member asked for more information about ticket.");
     res.json({status: 'success'});
-});
-router.post("/SuspendTicket", (req, res) => {
+};
+const SuspendTicket = (req, res) => {
     const name = req.cookies['name'];
     const user_id = req.cookies['user_id'];
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 9}}, (err, res) => {
@@ -129,8 +129,8 @@ router.post("/SuspendTicket", (req, res) => {
 
     console.log("<PROCESS_MODIFIED>Support Staff member suspended a ticket.");
     res.json({status: 'success'});
-});
-router.post("/CloseTicket", (req, res) => {
+};
+const CloseTicket = (req, res) => {
     const name = req.cookies['name'];
     const user_id = req.cookies['user_id'];
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 11}}, (err, res) => {
@@ -141,8 +141,8 @@ router.post("/CloseTicket", (req, res) => {
 
       console.log("<PROCESS_MODIFIED>Support Staff member closed a ticket.");
     res.json({status: 'success'});
-});
-router.post("/CloseExpiredTicket", (req, res) => {
+};
+const CloseExpiredTicket = (req, res) => {
     const name = req.cookies['name'];
     const user_id = req.cookies['user_id'];
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 12}}, (err, res) => {
@@ -153,8 +153,8 @@ router.post("/CloseExpiredTicket", (req, res) => {
 
     console.log("<PROCESS_MODIFIED>Support Staff memberclosed expired ticket.");
     res.json({status: 'success'});
-});
-router.post("/CloseAbandonedTicket", (req, res) => {
+};
+const CloseAbandonedTicket = (req, res) => {
     const name = req.cookies['name'];
     const user_id = req.cookies['user_id'];
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 15}}, (err, res) => {
@@ -167,8 +167,8 @@ router.post("/CloseAbandonedTicket", (req, res) => {
     console.log("<PROCESS_MODIFIED>Support Staff member closed abandoned ticket.");
 
     res.json({status: 'success'});
-});
-router.post("/SolveTicket", (req, res) => {
+};
+const SolveTicket = (req, res) => {
     const name = req.cookies['name'];
     const user_id = req.cookies['user_id'];
     
@@ -182,8 +182,8 @@ router.post("/SolveTicket", (req, res) => {
 
     console.log("<PROCESS_MODIFIED>Staff just solved a ticket");
     res.json({status: 'success'});
-});
-router.post("/ReallocateTicket", (req, res) => {
+};
+const ReallocateTicket = (req, res) => {
     const name = req.cookies['name'];
     const user_id = req.cookies['user_id'];
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 6, "currentSupportStaff": 'free', "staffId": 'free'}}, (err, res) => {
@@ -193,8 +193,8 @@ router.post("/ReallocateTicket", (req, res) => {
     connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {staffId: user_id, action: 'Ticket Reallocated', desc: "Ticket Rellocated by Staff member ", staffName: name, date: new Date().toISOString()}}});
     console.log("<PROCESS_MODIFIED>Support Staff member just reallocated a ticket.");
     res.json({status: 'success'});
-});
-router.post("/OpenTicketOnBehalf", (req, res) => {
+};
+const OpenTicketOnBehalf = (req, res) => {
         // Ticket ID will be populated later
         let ticketID_db;
         const username = req.cookies['username'];
@@ -213,13 +213,28 @@ router.post("/OpenTicketOnBehalf", (req, res) => {
             console.log("<PROCESS_MODIFIED>New Ticket was created by Support on Behalf of " + req.body.onBehalf);
         });   
         res.json({status: "ticket_created"})
-});
-router.post("/GetTicketHistory", (req, res) => {
+};
+const GetTicketHistory = (req, res) => {
    // Get ticket history for the particular ticket
    connection.collection("ticketHistory").findOne({ticketID: req.body.ticketID}, function(err, result) {
     if (err) throw err;
     res.json({history: result});
   });
-});
+};
+
 module.exports = router;
+module.exports.Register = Register;
+module.exports.GetMyTickets = GetMyTickets;
+module.exports.GetAvailableTickets = GetAvailableTickets;
+module.exports.ClaimTicket = ClaimTicket;
+module.exports.AskForMoreInformation = AskForMoreInformation;
+module.exports.SuspendTicket = SuspendTicket;
+module.exports.CloseTicket = CloseTicket;
+module.exports.CloseExpiredTicket = CloseExpiredTicket;
+module.exports.CloseAbandonedTicket = CloseAbandonedTicket;
+module.exports.SolveTicket = SolveTicket;
+module.exports.ReallocateTicket = ReallocateTicket;
+module.exports.OpenTicketOnBehalf = OpenTicketOnBehalf;
+module.exports.GetTicketHistory = GetTicketHistory;
+
 

@@ -135,9 +135,17 @@ class Dashboard extends Component {
     }
     render(){
         // USER CAN ONLY CANCEL TICKET FROM CERTAIN STATUS POINTS. THESE POINTS ARE
+        // Stage 1 and Stage 10
+
         // 1. ENTRY POINT, 5. Check Ticket, in our case true or false
+        // 1. Open Ticket 2. Open Ticket on Behalf 3. Allocation to Support 4. Self Allocate
+        // 5. Check Ticket 6. Reallocate ticket 7. Solve Ticket 8. Reopen ticket 9. Suspend Ticket
+        // 10. Add More Information, 11. Close Ticket, 12. Close Expired Ticket, 13. Cancel by Support
+        // 14. Cancel by user 15. Cancel abandoned ticket
         let cancellation = false;
-        if(this.state.currentItem.status === 'Ticket Opened' || this.state.currentItem.status === 'Check Ticket') cancellation = true;
+        let submitMore = false;
+        if(this.state.currentItem.status === 'Ticket Opened' || this.state.currentItem.status === 'More info needed') cancellation = true;
+        if(this.state.currentItem.status === 'More info needed') submitMore = true;
       return (
         <div className="dashboard">
             <div className="split left">
@@ -189,8 +197,8 @@ class Dashboard extends Component {
                             />
                         </div>
                         <div className="button-toolbar centered">
-                            <Button onClick={() => this.submitMoreInformation()}>SUBMIT MORE INFORMATION</Button>
-                            {cancellation ? <Button variant="danger" onClick={() => this.closeTicket()}>CLOSE TICKET</Button> : null }
+                            {submitMore && <Button onClick={() => this.submitMoreInformation()}>SUBMIT MORE INFORMATION</Button> }
+                            {cancellation && <Button variant="danger" onClick={() => this.closeTicket()}>CLOSE TICKET</Button> }
                         </div>
                     </div>
                 </div>

@@ -5,6 +5,7 @@ import Logout from './Logout';
 
 // For this.props.history.push
 import { withRouter} from 'react-router-dom';
+
 class Navi extends React.Component {
     constructor(){
       super();

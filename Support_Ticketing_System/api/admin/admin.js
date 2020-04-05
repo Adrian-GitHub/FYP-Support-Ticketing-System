@@ -14,30 +14,30 @@ const ObjectId = require('mongodb').ObjectId;
 const crypto = require('crypto');
 
 // Register route
-router.post("/Register", (req, res) => { // Form validation
-        connection.collection('users').findOne({ username: req.body.username }).then(user => {
-            if (user) {
-                return res.json({ username: "Username_taken" });
-            } else { // Hash password before saving in database
-                // Generate random salt
-                let salt = crypto.randomBytes(128).toString('base64');
-                // Hash the password using the generated salt
-                let hashedPassword = hashPassword(req.body.password, salt);
-                // Create new user
-                const newUser = new User({ name: req.body.name, username: req.body.username, password: hashedPassword, salt: salt, isWho: 'admin' });
-                // We have the data, user with hashed password. Now send data to mongoDB
-                // Put all data at main/users collection
-                connection.collection("users").insertOne(newUser, function (err, res) {
-                    // If something went wrong, throw the error
-                    if (err)
-                        throw err;
-                    // Else console.log that the user was added
-                    console.log("User<ADMIN>: " + req.body.name + " was added to the database. ");
-                });
-                return res.json({ username: "Username is free" });
-            };
-        });
-});
+const register = (req, res) => {
+    connection.collection('users').findOne({ username: req.body.username }).then(user => {
+        if (user) {
+            return res.json({ username: "Username_taken" });
+        } else { // Hash password before saving in database
+            // Generate random salt
+            let salt = crypto.randomBytes(128).toString('base64');
+            // Hash the password using the generated salt
+            let hashedPassword = hashPassword(req.body.password, salt);
+            // Create new user
+            const newUser = new User({ name: req.body.name, username: req.body.username, password: hashedPassword, salt: salt, isWho: 'admin' });
+            // We have the data, user with hashed password. Now send data to mongoDB
+            // Put all data at main/users collection
+            connection.collection("users").insertOne(newUser, function (err, res) {
+                // If something went wrong, throw the error
+                if (err)
+                    throw err;
+                // Else console.log that the user was added
+                console.log("User<ADMIN>: " + req.body.name + " was added to the database. ");
+            });
+            return res.json({ username: "Username is free" });
+        };
+    });
+};
 function hashPassword(password, salt){
      return hashedPassword = crypto.pbkdf2Sync(password, salt, 100000, 512, 'sha512', (err, key) => {
                     if (err)
@@ -45,9 +45,11 @@ function hashPassword(password, salt){
                 }).toString('hex')
 }
 // New Ticket Creation
-router.post("/NewTicket", (req, res) => { // Create new ticket with all data being customised
+const newTicket = (req, res) => { // Create new ticket with all data being customised
+    let ticketID;
     // Cookie user id created when logged in
     const user_id = req.cookies['user_id'];
+    const name = req.cookies['name'];
     // Data was sent from the admin dashboard
     // Create new ticket based on the data given to us
     const newTicket = new Ticket({ title: req.body.title, desc: req.body.description, createdBy: req.body.createdBy, createdById: user_id , currentSupportStaff: req.body.currentStaff ? req.body.currentStaff : 'free', status: req.body.ticketState ? req.body.ticketState : 1});
@@ -56,18 +58,19 @@ router.post("/NewTicket", (req, res) => { // Create new ticket with all data bei
         // If something went wrong, throw the error
         if (err)
             throw err;
+        // Data of inserted ticket
+        ticketID = res.insertedId;
         // Else console log for reference that new ticket was created by admin
-        console.log("New Ticket was created by Admin");
+        console.log("<CREATION>New Ticket was created by Admin");
         // Return status
+        const newTicketHistory = new TicketHistory({ticketID: ticketID, records: {staffId: user_id, action: 'Ticket created by Admin', desc: "Ticket Created ADMIN", staffName: name, date: new Date().toISOString()}});
+        connection.collection("ticketHistory").insertOne(newTicketHistory);
     });
-    const newTicketHistory = new TicketHistory({ticketID: ticketID, staffId: user_id, action: 'Ticket Created', desc: "Ticket created by Admin", staffName: 'ADMIN'});
-    onnection.collection("ticketHistory").updateOne({ticketID: ObjectId(ticketID)},{"$push":{record: {newTicketHistory}}});
-    console.log("<PROCESS_MODIFIED>New Ticket was created by Admin");
     return res.json({status: "ticket_created"})
-});
+};
 
 // Get all tickets from DB
-router.post("/GetStats", (req, res) => {
+const getStats = (req, res) => {
     /*
         VERIFY IF ADMIN BEFORE PROCEEDING
     */
@@ -117,8 +120,8 @@ router.post("/GetStats", (req, res) => {
             res.json({files: ticketData , userCount: userCount, staffCount: staffCount})
         });
     }  
-});
-router.post('/StaffDetails', (req,res) => {
+};
+const staffDetails = (req, res) => {
     // Create a link to DB for the users tab
     var cursor = connection.collection('users').find();
     // Variable to store data
@@ -146,9 +149,9 @@ router.post('/StaffDetails', (req,res) => {
         // Send constructed JSON from MongoDB data via RES to the frontend
         res.json({staffData: staffData})
     });
-});
+};
 // Get full list of staff members from DB
-router.post("/GetStaffList", (req, res) => {
+const staffList = (req, res) => {
     // Create a link to DB for the users tab
     var cursor = connection.collection('users').find();
     // Variable to store data
@@ -177,9 +180,9 @@ router.post("/GetStaffList", (req, res) => {
         // Send constructed JSON from MongoDB data via RES to the frontend
         res.json({staffData: staffData})
       });
-});
+};
 // Assigns staff to the ticket
-router.post('/AssignStaff', (req,res) => {
+const assignStaff = (req, res) => {
     // We are receiving ID and NAME of staff and Ticket ID
     // Assign it to the ticket
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"currentSupportStaff": req.body.name, "staffId": req.body.id}}, (err, res) => {
@@ -198,9 +201,9 @@ router.post('/AssignStaff', (req,res) => {
     });
     // Return status
     res.json({status: 'success'});
-});
+};
 // Chaning the status of a ticket
-router.post('/ChangeStatus', (req, res) => {
+const changeStatus = (req, res) => {
     // Firstly, we update the ticket
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": Number(req.body.ticketStatus)}}, (err, res) => {
         if(err) throw err;
@@ -220,21 +223,21 @@ router.post('/ChangeStatus', (req, res) => {
         console.log("Ticket status changed by admin to ticket " + req.body.ticketID);
     });
     res.json({status: 'success'});
-});
-router.post('/DeleteTicket', (req, res) => {
+};
+const deleteTicket = (req, res) => {
     // Firstly, we update the ticket
     connection.collection("tickets").findOneAndDelete({"_id": ObjectId(req.body.ticketID)}, (err, res) => {
         if(err) throw err;
     });
     res.json({status: 'success'});
-});
-router.post('/DeleteUser', (req, res) => {
+};
+const deleteUser = (req, res) => {
     connection.collection("users").findOneAndDelete({"_id": ObjectId(req.body.userID)}, (err, res) => {
         if(err) throw err;
     });
     res.json({status: 'success'});
-});
-router.post('/AskForMoreInformation', (req, res) => {
+};
+const askForMoreInformation = (req, res) => {
     // Update the ticket, with status 10. Status 10 means ASK FOR MORE INFORMATION
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 10}}, (err, res) => {
         if(err) throw err;
@@ -253,6 +256,18 @@ router.post('/AskForMoreInformation', (req, res) => {
         console.log("Ticket status changed by admin to ticket " + req.body.ticketID);
     });
     res.json({status: 'success'});
-});
+};
+
 module.exports = router;
+module.exports.register = register;
+module.exports.newTicket = newTicket;
+module.exports.getStats = getStats;
+module.exports.staffDetails = staffDetails;
+module.exports.staffList = staffList;
+module.exports.assignStaff = assignStaff;
+module.exports.changeStatus = changeStatus;
+module.exports.deleteTicket = deleteTicket;
+module.exports.deleteUser = deleteUser;
+module.exports.askForMoreInformation = askForMoreInformation;
+
 

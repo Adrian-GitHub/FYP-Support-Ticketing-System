@@ -13,7 +13,7 @@ const ObjectId = require('mongodb').ObjectId;
 const crypto = require('crypto');
 
 // Register route
-router.post("/Register", (req, res) => { // Form validation
+const register = (req, res) => { // Form validation
         connection.collection('users').findOne({ username: req.body.username }).then(user => {
             if (user) {
                 return res.json({ username: "Username_taken" });
@@ -36,7 +36,7 @@ router.post("/Register", (req, res) => { // Form validation
                 return res.json({ username: "Username is free" });
             };
         });
-});
+};
 
 function hashPassword(password, salt){
      return hashedPassword = crypto.pbkdf2Sync(password, salt, 100000, 512, 'sha512', (err, key) => {
@@ -44,9 +44,8 @@ function hashPassword(password, salt){
                         throw err;
                 }).toString('hex')
 }
-
 // Create new ticket
-router.post("/CreateTicket", (req, res) => {
+const createTicket = (req, res) => {
     // Ticket ID will be populated later
     let ticketID;
     const username = req.cookies['username'];
@@ -67,9 +66,9 @@ router.post("/CreateTicket", (req, res) => {
         console.log("<PROCESS_MODIFIED>New Ticket was created by Client");
     });   
     return res.json({status: "success"})
-});
+};
 // Get All Tickets belonging to this user
-router.post("/GetTickets", (req, res) => {
+const getTickets = (req, res) => {
     const username = req.cookies['username'];
     const user_id = req.cookies['user_id'];
     if(!username)// if username is not defined
@@ -97,8 +96,8 @@ router.post("/GetTickets", (req, res) => {
           //done by error
           res.json({status: 'success', tickets: ticketData})
       });
-});
-router.post("/GetUserData", (req, res) => {
+};
+const getUserData = (req, res) => {
     //Variable that will be returned via json response
     const userData = [];
     //Getting user, that was authed during login
@@ -128,8 +127,8 @@ router.post("/GetUserData", (req, res) => {
         //Send it back to the user
         res.json({userData: userData, ticketData: ticketCount });
     });
-});
-router.post("/ChangePassword", (req, res) => {
+};
+const changePassword = (req, res) => {
     const username = req.cookies['username'];
     let salt, hashedPassword;
     try{
@@ -140,8 +139,8 @@ router.post("/ChangePassword", (req, res) => {
         if(err) throw err;
     });
     res.json({status: 'success'});
-});
-router.post("/DeleteAccount", (req, res) => {
+};
+const deleteAccount = (req, res) => {
     const username = req.cookies['username'];
     connection.collection("users").deleteOne({"username": username}, (err, results) => {
         if (err) throw err;
@@ -151,16 +150,16 @@ router.post("/DeleteAccount", (req, res) => {
     res.clearCookie("username");
     res.clearCookie("user_id");
     res.json({status: "success"})
-});
-router.post("/CloseTicket", (req, res) => {
+};
+const closeTicket = (req, res) => {
     const id = req.body.id;
     console.log(id)
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(id)} ,{"$set": {"status": 14 }}, (err, res) => {
         if(err) throw err;
     });
     res.json({status: 'success'});
-});
-router.post("/SubmitMoreInformation", (req, res) => {
+};
+const submitMoreInformation = (req, res) => {
     // Ticket ID and Message are passed into here
     const ticketID = req.body.id;
     const message = req.body.message;
@@ -168,7 +167,15 @@ router.post("/SubmitMoreInformation", (req, res) => {
       connection.collection("ticketHistory").updateOne({"ticketID": ticketID},{"$push":{records: {date: new Date().toISOString(), staffId: 'CLIENT', action: 'MORE INFORMATION ADDED', desc: message , staffName: 'CLIENT'}}});
       res.json({status: 'success'});
     }
-});
+};
 
 module.exports = router;
+module.exports.register = register;
+module.exports.createTicket = createTicket;
+module.exports.getTickets = getTickets;
+module.exports.getUserData = getUserData;
+module.exports.changePassword = changePassword;
+module.exports.deleteAccount = deleteAccount;
+module.exports.closeTicket = closeTicket;
+module.exports.submitMoreInformation = submitMoreInformation;
 

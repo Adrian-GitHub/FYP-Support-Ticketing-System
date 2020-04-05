@@ -19,10 +19,10 @@ mongoDB.connectToServer( function( err ) {
     if (err) console.log(err);
     else console.log("Connection to the Mongo Database successful!");
     // Routes
-    const admin = require('./api/admin/admin');
-    const client = require("./api/client/client");
-    const support = require("./api/support/support");
-    const login = require("./api/shared/login");
+    const admin = require('./api/routes_admin');
+    const client = require('./api/routes_client');
+    const support = require("./api/routes_support");
+    const login = require("./api/routes_auth");
     app.use("/api/admin", admin);
     app.use("/api/client", client);
     app.use("/api/support", support);

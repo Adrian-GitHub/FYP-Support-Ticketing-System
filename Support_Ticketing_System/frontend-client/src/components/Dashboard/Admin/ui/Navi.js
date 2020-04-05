@@ -3,9 +3,12 @@ import { Nav, Navbar } from 'react-bootstrap';
 import Staff from './modals/Staff_Modal';
 // Modal, new ticket creation
 import NewTicket from './modals/Ticket_Modal';
+// Logout
+import Logout from './Logout';
+// For this.props.history.push
+import { withRouter} from 'react-router-dom';
 
-
-export default class Navi extends React.Component {
+class Navi extends React.Component {
     constructor(){
       super();
       this.state = ({
@@ -26,6 +29,7 @@ export default class Navi extends React.Component {
             <Nav className="mr-auto">
               <Nav.Link onClick={() => this.setState({staff: true}) }>Staff Managment</Nav.Link>
               <Nav.Link onClick={() => NewTicket()}>New Ticket</Nav.Link>
+              <Nav.Link name="test-logout" onClick={() => Logout(this.props)}>Logout</Nav.Link>
             </Nav>
           </Navbar.Collapse>
           </Navbar>
@@ -35,3 +39,4 @@ export default class Navi extends React.Component {
       );
     }
 }
+export default withRouter(Navi);
