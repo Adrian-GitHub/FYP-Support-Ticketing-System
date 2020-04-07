@@ -1,5 +1,5 @@
 import Swal from 'sweetalert2';
-export function solveTicket(props) {
+export function solveTicket(props, camundaID) {
     let desc;
     Swal.fire({
         title: 'Solving Ticket',
@@ -20,7 +20,7 @@ export function solveTicket(props) {
         if (!result.dismiss) {
             fetch('/api/support/SolveTicket', {
                 method: 'POST',
-                body: JSON.stringify({ ticketID: props, ticketDesc: desc }),
+                body: JSON.stringify({ ticketID: props, ticketDesc: desc, camundaID: camundaID }),
                 headers: {
                     "Content-Type": "application/json"
                 }

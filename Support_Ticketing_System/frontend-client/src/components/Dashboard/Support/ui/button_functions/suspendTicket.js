@@ -1,5 +1,5 @@
 import Swal from 'sweetalert2';
-export function suspendTicket(props) {
+export function suspendTicket(props, camundaID) {
     Swal.fire({
         title: 'Suspending the ticket',
         showCancelButton: true,
@@ -11,7 +11,7 @@ export function suspendTicket(props) {
         if (!result.dismiss) {
             fetch('/api/support/SuspendTicket', {
                 method: 'POST',
-                body: JSON.stringify({ ticketID: props }),
+                body: JSON.stringify({ ticketID: props, camundaID: camundaID }),
                 headers: {
                     "Content-Type": "application/json"
                 }

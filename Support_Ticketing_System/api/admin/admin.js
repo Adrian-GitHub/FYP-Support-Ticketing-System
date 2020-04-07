@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+// Fetch statement
+const fetch = require('node-fetch');
 // Load User model for MongoDB(used by Mongoose)
 const User = require('../../database/models/User_Account');
 // Ticket Model
@@ -45,14 +47,42 @@ function hashPassword(password, salt){
                 }).toString('hex')
 }
 // New Ticket Creation
-const newTicket = (req, res) => { // Create new ticket with all data being customised
+const newTicket = async(req, res) => { // Create new ticket with all data being customised
+    // Camunda's ID
+    let Camunda_ID;
+    // Ticket ID for History
     let ticketID;
     // Cookie user id created when logged in
     const user_id = req.cookies['user_id'];
     const name = req.cookies['name'];
     // Data was sent from the admin dashboard
+
+    //**
+    // Before proceeding futher, send this task to the Camunda engine to start a process instance there
+    // The reason for await is that we want to wait here, we don't neccessarily rely on the data from Camunda itself.
+    // This function will return us executionID which is the ID of the task started. We will store it along with the ticket
+    // so that we can refer to it later on and move with the process instance later on
+    //**
+    await fetch('http://localhost:8080/engine-rest/process-definition/key/TicketingSystem/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(res => res.json())
+    .then(json => Camunda_ID = json.id).catch((err) => console.log(err));
+
+     // THE ID returned to us by Camunda isn't the ID we're looking for because that ID only allows us to lookup the task not modify it
+     // Making 2nd call to get the actual ID and overwriting the Camunda_ID with the correct one
+
+    await fetch(`http://localhost:8080/engine-rest/task?processInstanceId=${Camunda_ID}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(res => res.json())
+    .then(json => Camunda_ID = json[0].id).catch((err) => console.log(err));
+
+
     // Create new ticket based on the data given to us
-    const newTicket = new Ticket({ title: req.body.title, desc: req.body.description, createdBy: req.body.createdBy, createdById: user_id , currentSupportStaff: req.body.currentStaff ? req.body.currentStaff : 'free', status: req.body.ticketState ? req.body.ticketState : 1});
+    const newTicket = new Ticket({camundaID: Camunda_ID, title: req.body.title, desc: req.body.description, createdBy: req.body.createdBy, createdById: user_id , currentSupportStaff: req.body.currentStaff ? req.body.currentStaff : 'free', status: req.body.ticketState ? req.body.ticketState : 1});
     // Open DB and then insert new ticket using Ticket Model defined
     connection.collection("tickets").insertOne(newTicket, function (err, res) {
         // If something went wrong, throw the error

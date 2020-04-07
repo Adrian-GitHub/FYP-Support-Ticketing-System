@@ -1,13 +1,14 @@
 # FYP-Support-Ticketing-System
 # Structure
 
-The main system is divided into sub-folders which are spread-out throughout the project. This is because the project itself is a combination of MERN stack associated with other libraries which are used for testing. 
+The main system is divided into sub-folders which are spread-out throughout the project. This is because the project itself is a combination of MERN stack associated with other libraries which are used for testing. The system implements a 3rd party engine (Business Process Management) BPM, known as Camunda.
 
 
 ### Directory layout
 
     .
     ├── Diagrams                             # Diagrams which show system process
+    ├── ├── Camunda                          # Folder in which diagrams for BPM Engine are located
     ├── Support_Ticketing_System             # The deliverable
     ├── ├── auto-test.js                     # Automated testing file
     ├── ├── *.**                             # All back-end files excluding front-end folder
@@ -31,6 +32,20 @@ Now let's install the client (back-end and front-end).
 2. Do `npm install` and wait until that completes.
 2. Now proceed to front-end directory by typing `cd frontend-client` in the terminal.
 3. Do `npm install` and wait until that completes.
+
+After these steps the client/server/database are good to go. One more final step, as this project relies on BPM Engine it is advised to install it.
+Head over to [Camunda](https://camunda.com/download/) website to download the [Server](https://camunda.com/download/) and the [Modeller](https://camunda.com/download/modeler/) associated with it. Choose Community Edition, GA Release(should be selected by default), then **ZIP** file.
+
+Now, lets set it up.
+
+1. Unpack the ZIP folder into your desired place and then extract all the files. Click on `start-camunda.bat`.
+Server is running.
+2. Upload the diagram via Modeller. Start the `Camunda Modeler.exe`.
+3. Drag the BPMN Diagram file from `Diagrams/Camunda/`,the file name is `THE PROCESS.bpmn`. Into the modeller.
+4. Click the `DEPLOY CURRENT DIAGRAM` button located at the top, the icon resembles UPLOAD button.
+5. Confirm the dialogue that just popped up and it should notify you of a success.
+
+Done. The BPMN Server (Camunda) is up and running. Everything has been setup inside the client and server to communicate with it by default.
 
 ## Usage
 After the installation is completed successfully the deliverable should be ready to be launched.

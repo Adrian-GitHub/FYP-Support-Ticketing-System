@@ -4,6 +4,10 @@ const Schema = mongoose.Schema;
 
 // Create Ticket_Process Schema
 const Ticket_Process = new Schema({
+    camundaID: {
+        type: String,
+        default: 0
+    },
     title: {
         type: String,
         required: true

@@ -1,5 +1,5 @@
 import Swal from 'sweetalert2';
-export function reallocateTicket(props) {
+export function reallocateTicket(props, camundaID) {
     Swal.fire({
         title: 'Reallocation of Ticket',
         text: "This can't be reverted. Are you sure?",
@@ -11,7 +11,7 @@ export function reallocateTicket(props) {
         if (!result.dismiss) {
             fetch('/api/support/ReallocateTicket', {
                 method: 'POST',
-                body: JSON.stringify({ ticketID: props }),
+                body: JSON.stringify({ ticketID: props, camundaID: camundaID }),
                 headers: {
                     "Content-Type": "application/json"
                 }

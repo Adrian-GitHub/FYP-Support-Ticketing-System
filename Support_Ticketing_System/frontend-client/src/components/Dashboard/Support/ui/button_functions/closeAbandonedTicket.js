@@ -1,5 +1,5 @@
 import Swal from 'sweetalert2';
-export function closeAbandonedTicket(props) {
+export function closeAbandonedTicket(props, camundaID) {
     Swal.fire({
         title: 'Closing abanonded ticket',
         text: "Are you sure you want to close abanonded ticket?",
@@ -11,7 +11,7 @@ export function closeAbandonedTicket(props) {
         if (!result.dismiss) {
             fetch('/api/support/CloseAbandonedTicket', {
                 method: 'POST',
-                body: JSON.stringify({ ticketID: props }),
+                body: JSON.stringify({ ticketID: props, camundaID: camundaID }),
                 headers: {
                     "Content-Type": "application/json"
                 }

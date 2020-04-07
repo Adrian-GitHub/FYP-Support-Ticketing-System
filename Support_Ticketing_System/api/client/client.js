@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+// Fetch statement
+const fetch = require('node-fetch');
 // Load User's model for MongoDB(used by Mongoose)
 const User = require("../../database/models/User_Account");
 // For ticket creation
@@ -45,13 +47,45 @@ function hashPassword(password, salt){
                 }).toString('hex')
 }
 // Create new ticket
-const createTicket = (req, res) => {
+const createTicket = async(req, res) => {
+    // Camunda's ID
+    let Camunda_ID;
     // Ticket ID will be populated later
     let ticketID;
     const username = req.cookies['username'];
     const name = req.cookies['name'];
     const user_id = req.cookies['user_id'];
-    const newTicket = new Ticket({ title: req.body.ticketTitle, desc: req.body.ticketDesc, createdBy: username, createdById: user_id , currentSupportStaff: 'free', status: 1});
+
+    //**
+    // Before proceeding futher, send this task to the Camunda engine to start a process instance there
+    // The reason for await is that we want to wait here, we don't neccessarily rely on the data from Camunda itself.
+    // This function will return us executionID which is the ID of the task started. We will store it along with the ticket
+    // so that we can refer to it later on and move with the process instance later on
+    //**
+    const requestBody =  {
+        "variables": {
+          "theOpeningEntity": {"value":"true","type":"String"} // true for client
+        }
+    };
+    await fetch('http://localhost:8080/engine-rest/process-definition/key/TicketingSystem/start', {
+        method: 'POST',
+        body: JSON.stringify(requestBody),  //client
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(res => res.json())
+    .then(json => Camunda_ID = json.id).catch((err) => console.log(err));
+
+     // THE ID returned to us by Camunda isn't the ID we're looking for because that ID only allows us to lookup the task not modify it
+     // Making 2nd call to get the actual ID and overwriting the Camunda_ID with the correct one
+
+    await fetch(`http://localhost:8080/engine-rest/task?processInstanceId=${Camunda_ID}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(res => res.json())
+    .then(json => Camunda_ID = json[0].processInstanceId).catch((err) => console.log(err));
+
+    const newTicket = new Ticket({camundaID: Camunda_ID, title: req.body.ticketTitle, desc: req.body.ticketDesc, createdBy: username, createdById: user_id , currentSupportStaff: 'free', status: 1});
     // Open DB and then insert new ticket using Ticket Model defined
     connection.collection("tickets").insertOne(newTicket, function (err, res) {
         // If something went wrong, throw the error
@@ -61,7 +95,7 @@ const createTicket = (req, res) => {
         console.log("New Ticket was created by Client " + username);
         // Assign the value of inserted ID to our variable
         ticketID = res.insertedId;
-        const newTicketHistory = new TicketHistory({ticketID: ticketID, records: {staffId: user_id, action: 'Ticket Created by the CLIENT', desc: "Created by "+ username +" (CLIENT)", staffName: "CLIENT", date: new Date().toISOString()}});
+        const newTicketHistory = new TicketHistory({ticketID: ticketID, records: {staffId: user_id, action: 'Ticket Created by the CLIENT', desc: "Created by "+ name +" (CLIENT'S NAME)", staffName: "CLIENT", date: new Date().toISOString()}});
         connection.collection("ticketHistory").insertOne(newTicketHistory);
         console.log("<PROCESS_MODIFIED>New Ticket was created by Client");
     });   
@@ -151,20 +185,70 @@ const deleteAccount = (req, res) => {
     res.clearCookie("user_id");
     res.json({status: "success"})
 };
-const closeTicket = (req, res) => {
+const closeTicket = async(req, res) => {
     const id = req.body.id;
     console.log(id)
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(id)} ,{"$set": {"status": 14 }}, (err, res) => {
         if(err) throw err;
     });
+    console.log('<PROCESS_MODIFIED>Ticket was closed by Client');
+    // Now, repeat this inside Camunda's engine
+    let Camunda_ID;
+    const requestBody =  {
+        "variables": {
+          "cancel": {"value":"true","type":"String"} // Yes, client cancels the ticket
+        }
+    };
+    // Before we begin, we will need to fetch new ID and then use this ID to complete the task
+    await fetch(`http://localhost:8080/engine-rest/task?processInstanceId=${req.body.camundaID}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        })
+        .then(res => res.json())
+        .then(json => Camunda_ID = json[0].id).catch((err) => console.log(err));
+    await fetch(`http://localhost:8080/engine-rest/task/${Camunda_ID}/complete`, {
+        method: 'POST',
+        body: JSON.stringify(requestBody),  //client
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .catch((err) => console.log(err));
+
+    // End of CAMUNDA REST API COMMUNICATION
+
     res.json({status: 'success'});
 };
-const submitMoreInformation = (req, res) => {
+const submitMoreInformation = async(req, res) => {
     // Ticket ID and Message are passed into here
     const ticketID = req.body.id;
     const message = req.body.message;
     if(ticketID){
+      // Update the ticket so that the support knows that the user has submitted more information 
       connection.collection("ticketHistory").updateOne({"ticketID": ticketID},{"$push":{records: {date: new Date().toISOString(), staffId: 'CLIENT', action: 'MORE INFORMATION ADDED', desc: message , staffName: 'CLIENT'}}});
+      // Update ticket status so that the system recognises this ticket again. As when support requests more information, the ticket is in a `suspended` state meaning that none can interact with it except the client
+      connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(ticketID)} ,{"$set": {"status": Number(5)}});
+      // Before finishing this, let Camunda know about this
+        // The payload
+        const requestBody =  {
+            "variables": {
+            "informationSubmitted": {"value":"true","type":"String"}
+            }
+        };
+        // Before we begin, we will need to fetch new ID and then use this ID to complete the task
+        let Camunda_ID;
+        await fetch(`http://localhost:8080/engine-rest/task?processInstanceId=${req.body.camundaID}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(res => res.json())
+            .then(json => Camunda_ID = json[0].id).catch((err) => console.log(err));
+        await fetch(`http://localhost:8080/engine-rest/task/${Camunda_ID}/complete`, {
+            method: 'POST',
+            body: JSON.stringify(requestBody),  //client
+            headers: { 'Content-Type': 'application/json' },
+        })
+        .catch((err) => console.log(err));
+
+    // End of CAMUNDA REST API COMMUNICATION
       res.json({status: 'success'});
     }
 };

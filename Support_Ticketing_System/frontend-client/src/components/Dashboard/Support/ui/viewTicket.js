@@ -82,14 +82,17 @@ class ViewTicket extends Component {
     
     // Decide which buttons to show
     // Stage 5
-    if(this.props.ticket.status === 'Ticket Opened') {
+    if(this.props.ticket.status === 'Ticket Opened' || this.props.ticket.status ==='Ticket Behalf' || this.props.ticket.status === 'Ticket Checked') {
       suspendTicket_boolean = false;
       reallocTicket_boolean = false;
       solveTicket_boolean = false;
       closeTicket_boolean = false;
     }
     // Stage 7
-    else if(this.props.ticket.status === 'Ticket Solved') closeExpiredTicket_boolean = false;
+    else if(this.props.ticket.status === 'Ticket Solved') {
+      closeExpiredTicket_boolean = false;
+      closeTicket_boolean = false;
+    }
     // Stage 9
     else if(this.props.ticket.status === 'Ticket Suspended') {
       ask4moInfo_boolean = false;
@@ -97,7 +100,7 @@ class ViewTicket extends Component {
     }
 
     let { ticketHistory } = this.state;
-
+    console.log(this.props.ticket)
     return (
       <div>
           <div>
@@ -109,13 +112,13 @@ class ViewTicket extends Component {
             <div className="button-toolbar centered-light">
               {/*  This buttons are visible depending on the stage of a ticket.
               // Everything in here happens after Stage 5 (corresponding to the diagram) */}
-                <Button disabled={ask4moInfo_boolean} id="ask4moInfo" onClick={() => askForMoreInformation(this.props.ticket.id) }>ASK FOR MORE INFORMATION</Button>
-                <Button disabled={suspendTicket_boolean} id="suspendTicket" onClick={() => suspendTicket(this.props.ticket.id)}>SUSPEND TICKET</Button>
-                <Button disabled={closeTicket_boolean} id="closeTicket" onClick={() => closeTicket(this.props.ticket.id)}>CLOSE TICKET</Button>
-                <Button disabled={closeExpiredTicket_boolean} id="closeExpiredTicket" onClick={() => closeExpiredTicket(this.props.ticket.id)}>CLOSE EXPIRED TICKET</Button>
-                <Button disabled={closeAbandonedTicket_boolean} id="closeAbdTicket" onClick={() => closeAbandonedTicket(this.props.ticket.id)}>CLOSE ABANONDED TICKET</Button>
-                <Button disabled={solveTicket_boolean} id="solveTicket" onClick={() => solveTicket(this.props.ticket.id)}>SOLVE TICKET</Button>
-                <Button disabled={reallocTicket_boolean} id="reallocTicket" onClick={() => reallocateTicket(this.props.ticket.id)}>REALLOCATE TICKET</Button>
+                <Button disabled={ask4moInfo_boolean} id="ask4moInfo" onClick={() => askForMoreInformation(this.props.ticket.id, this.props.ticket.camundaID) }>ASK FOR MORE INFORMATION</Button>
+                <Button disabled={suspendTicket_boolean} id="suspendTicket" onClick={() => suspendTicket(this.props.ticket.id, this.props.ticket.camundaID)}>SUSPEND TICKET</Button>
+                <Button disabled={closeTicket_boolean} id="closeTicket" onClick={() => closeTicket(this.props.ticket.id, this.props.ticket.camundaID, this.props.ticket.status)}>CLOSE TICKET</Button>
+                <Button disabled={closeExpiredTicket_boolean} id="closeExpiredTicket" onClick={() => closeExpiredTicket(this.props.ticket.id, this.props.ticket.camundaID)}>CLOSE EXPIRED TICKET</Button>
+                <Button disabled={closeAbandonedTicket_boolean} id="closeAbdTicket" onClick={() => closeAbandonedTicket(this.props.ticket.id, this.props.ticket.camundaID)}>CLOSE ABANONDED TICKET</Button>
+                <Button disabled={solveTicket_boolean} id="solveTicket" onClick={() => solveTicket(this.props.ticket.id, this.props.ticket.camundaID)}>SOLVE TICKET</Button>
+                <Button disabled={reallocTicket_boolean} id="reallocTicket" onClick={() => reallocateTicket(this.props.ticket.id, this.props.ticket.camundaID)}>REALLOCATE TICKET</Button>
             </div>
             </div>
             </div>

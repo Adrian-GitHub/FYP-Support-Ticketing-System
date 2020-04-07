@@ -1,5 +1,5 @@
 import Swal from 'sweetalert2';
-export default function claimTicket(id, title, creator) {
+export default function claimTicket(id, title, creator, camunda) {
     Swal.fire({
         title: `<i>Claiming ticket: ${title}</i>`,
         html: `Are you sure that you want to claim ticket <strong>${title}</strong> which was created by <strong>${creator}</strong>?`,
@@ -13,7 +13,7 @@ export default function claimTicket(id, title, creator) {
         if (result.value) {
             fetch('/api/support/ClaimTicket', {
                 method: 'POST',
-                body: JSON.stringify({ticketID: id}),
+                body: JSON.stringify({ticketID: id, camundaID: camunda}),
                 headers: {
                   "Content-Type": "application/json"
                 }

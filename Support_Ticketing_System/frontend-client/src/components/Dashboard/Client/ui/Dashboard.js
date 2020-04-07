@@ -59,7 +59,8 @@ class Dashboard extends Component {
                         staff: staff,
                         status: status,
                         commentsAuthor: commentsAuthor,
-                        comments: comments
+                        comments: comments,
+                        camundaID: element.camundaID
                     });
                     this.setState({tickets: tempTickets});
                 });
@@ -81,7 +82,7 @@ class Dashboard extends Component {
             if (result.value) {
                 fetch('/api/client/CloseTicket', {
                     method: 'POST',
-                    body: JSON.stringify({id: this.state.currentItem.id}),
+                    body: JSON.stringify({id: this.state.currentItem.id, camundaID: this.state.currentItem.camundaID}),
                     headers: {
                       "Content-Type": "application/json"
                     }
@@ -115,7 +116,7 @@ class Dashboard extends Component {
             if (result.value) {
                 fetch('/api/client/SubmitMoreInformation', {
                     method: 'POST',
-                    body: JSON.stringify({id: this.state.currentItem.id, message: result.value}),
+                    body: JSON.stringify({id: this.state.currentItem.id, message: result.value, camundaID: this.state.currentItem.camundaID}),
                     headers: {
                       "Content-Type": "application/json"
                     }

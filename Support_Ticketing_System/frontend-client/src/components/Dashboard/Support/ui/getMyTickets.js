@@ -44,7 +44,8 @@ export async function getMyTickets() {
                     dateCreated: date,
                     status: status,
                     commentsAuthor: commentsAuthor,
-                    comments: comments
+                    comments: comments,
+                    camundaID: element.camundaID
                 });
             });
             return tempTickets;

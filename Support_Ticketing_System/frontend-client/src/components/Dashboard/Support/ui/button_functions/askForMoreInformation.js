@@ -1,5 +1,5 @@
 import Swal from 'sweetalert2';
-export function askForMoreInformation(props) {
+export function askForMoreInformation(props, camundaID) {
     let desc;
     Swal.fire({
         title: 'Asking for more information',
@@ -20,7 +20,7 @@ export function askForMoreInformation(props) {
         if (!result.dismiss) {
             fetch('/api/support/AskForMoreInformation', {
                 method: 'POST',
-                body: JSON.stringify({ ticketID: props, ticketDesc: desc }),
+                body: JSON.stringify({ ticketID: props, ticketDesc: desc, camundaID: camundaID }),
                 headers: {
                     "Content-Type": "application/json"
                 }
