@@ -205,7 +205,7 @@ describe('BACK-END API TESTING', function() {
 
   //   it('Creation of a ticket', (done) => {
   //     request(app)
-  //       .post('/api/client/CreateTicket')
+  //       .post('/api/ticket/CreateTicket')
   //       .set('Accept', 'application/json')
   //       .set('Content-Type', 'application/json')
   //       .send({ title: 'test_ticket', createdBy: 'client_Test', description: 'Test ticket created by testing suite', ticketState: '5', currentStaff: 'admin' })

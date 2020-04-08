@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+// For password hashing
+const User = require("../../database/models/User_Account");
 // MongoDB
 var MongoClient = require('../../database/config/DatabaseConnection');
 var connection = MongoClient.getDb();
@@ -9,12 +11,6 @@ const crypto = require('crypto');
 // Authentication
 const jwt = require('jsonwebtoken');
 //Login route
-function hashPassword(password, salt){
-    return hashedPassword = crypto.pbkdf2Sync(password, salt, 100000, 512, 'sha512', (err, key) => {
-                   if (err)
-                       throw err;
-               }).toString('hex')
-}
 const Login = (req, res) => { // Form validation
    const username = req.body.username;
    const password = req.body.password;
@@ -23,7 +19,7 @@ const Login = (req, res) => { // Form validation
            if(user)//if user exists
            {   
                //Hash the password using the salt obtained from the DB
-               let hashedPwd = hashPassword(password, user.salt);
+               let hashedPwd = User.hashPassword(password, user.salt);
                //Verify the password if the given one matches the provided one
                if(hashedPwd === user.password){
                    // Generate and assign JSON Web Token

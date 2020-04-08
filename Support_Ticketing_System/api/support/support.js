@@ -21,7 +21,7 @@ const Register = (req, res) => { // Form validation
                 // Generate random salt
                 let salt = crypto.randomBytes(128).toString('base64');
                 // Hash the password using the generated salt
-                let hashedPassword = hashPassword(req.body.password, salt);
+                let hashedPassword = User.hashPassword(req.body.password, salt);
                 // Create new user
                 const newUser = new User({ name: req.body.name, username: req.body.username, password: hashedPassword, salt: salt, isWho: 'support' });
                 // We have the data, user with hashed password. Now send data to mongoDB
@@ -36,12 +36,6 @@ const Register = (req, res) => { // Form validation
                 return res.json({ username: "Username is free" });
             };
         });
-};
-function hashPassword(password, salt){
-     return hashedPassword = crypto.pbkdf2Sync(password, salt, 100000, 512, 'sha512', (err, key) => {
-                    if (err)
-                        throw err;
-                }).toString('hex')
 };
 const GetMyTickets = (req, res) => {
     const username = req.cookies['username'];

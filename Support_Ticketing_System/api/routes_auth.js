@@ -11,12 +11,7 @@ const router = express.Router();
 
 // Everything is account related in this file
 
-router.post("/Login", (req, res) => {
-    auth.Login(req, res);
-});
-
-router.post("/Logout", (req, res) => {
-    auth.Logout(req, res);
-});
+router.post("/Login", auth.Login);
+router.post("/Logout", auth.Logout);
 
 module.exports = router;

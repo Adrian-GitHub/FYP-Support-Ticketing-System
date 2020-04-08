@@ -10,48 +10,28 @@ const express = require("express");
 const router = express.Router();
 
 // Register functions
-router.post("/Register", (req, res) => {
-    admin.register(req, res);
-});
+router.post("/Register", admin.register);
 
 // Ticket functions
-router.post("/NewTicket", (req, res) => { 
-    admin.newTicket(req, res);
-});
+router.post("/NewTicket", admin.newTicket);
 // Chaning the status of a ticket
-router.post('/ChangeStatus', (req, res) => {
-    admin.changeStatus(req, res);
-});
+router.post('/ChangeStatus', admin.changeStatus);
 // Deletes the ticket
-router.post('/DeleteTicket', (req, res) => {
-    admin.deleteTicket(req, res);
-});
+router.post('/DeleteTicket', admin.deleteTicket);
 // Ticket related task
-router.post('/AskForMoreInformation', (req, res) => {
-    admin.askForMoreInformation(req,res);
-});
+router.post('/AskForMoreInformation', admin.askForMoreInformation);
 
 // User specific functions
 
 // Get statistics, amount of tickets, users etc.,
-router.post("/GetStats", (req, res) => {
-    admin.getStats(req, res);
-});
+router.post("/GetStats", admin.getStats);
 // Staff specific statistics
-router.post('/StaffDetails', (req,res) => {
-    admin.staffDetails(req, res);
-});
+router.post('/StaffDetails', admin.staffDetails);
 // Get full list of staff members from DB
-router.post("/GetStaffList", (req, res) => {
-    admin.staffList(req, res);
-});
+router.post("/GetStaffList", admin.staffList);
 // Assigns staff to the ticket
-router.post('/AssignStaff', (req,res) => {
-    admin.assignStaff(req, res);
-});
+router.post('/AssignStaff', admin.assignStaff);
 // Removes the staff member from the database or client.
-router.post('/DeleteUser', (req, res) => {
-    admin.deleteUser(req, res);
-});
+router.post('/DeleteUser', admin.deleteUser);
 
 module.exports = router;

@@ -24,7 +24,7 @@ class Dashboard extends Component {
     }
     // When component is "loaded", fetch ticket data corresponding to this user
     componentDidMount(){
-        fetch('/api/client/GetTickets', {
+        fetch('/api/ticket/GetTickets', {
             method: 'POST',
             // We are not sending anything as user is authed in the backend as well, so we will verify his authenticity there
             headers: {
@@ -80,7 +80,7 @@ class Dashboard extends Component {
             confirmButtonText: 'Yes, close my ticket'
           }).then((result) => {
             if (result.value) {
-                fetch('/api/client/CloseTicket', {
+                fetch('/api/ticket/CloseTicket', {
                     method: 'POST',
                     body: JSON.stringify({id: this.state.currentItem.id, camundaID: this.state.currentItem.camundaID}),
                     headers: {
@@ -114,7 +114,7 @@ class Dashboard extends Component {
             confirmButtonText: 'Submit'
           }).then((result) => {
             if (result.value) {
-                fetch('/api/client/SubmitMoreInformation', {
+                fetch('/api/ticket/SubmitMoreInformation', {
                     method: 'POST',
                     body: JSON.stringify({id: this.state.currentItem.id, message: result.value, camundaID: this.state.currentItem.camundaID}),
                     headers: {

@@ -10,38 +10,10 @@ const client = require("./client/client");
 const express = require("express");
 const router = express.Router();
 
-// Account related functions
-router.post("/Register", (req, res) => {
-    client.register(req, res);
-});
-router.post("/ChangePassword", (req, res) => {
-    client.changePassword(req, res);
-});
-router.post("/DeleteAccount", (req, res) => {
-    client.deleteAccount(req, res);
-});
+router.post("/Register", client.register);
+router.post("/ChangePassword", client.changePassword);
+router.post("/DeleteAccount", client.deleteAccount);
 // Get ALL data about the account that's logged in
-router.post("/GetUserData", (req, res) => {
-    client.getUserData(req, res);
-});
-
-// Ticket related functions
-
-// Create new ticket
-router.post("/CreateTicket", (req, res) => {
-    client.createTicket(req, res);
-});
-// Get All Tickets belonging to this user
-router.post("/GetTickets", (req, res) => {
-    client.getTickets(req,res);
-});
-// Close the selected ticket
-router.post("/CloseTicket", (req, res) => {
-    client.closeTicket(req, res);
-});
-// Submits more information regarding "more information" topic as asked by staff member
-router.post("/SubmitMoreInformation", (req, res) => {
-    client.submitMoreInformation(req, res);
-});
+router.post("/GetUserData", client.getUserData);
 
 module.exports = router;

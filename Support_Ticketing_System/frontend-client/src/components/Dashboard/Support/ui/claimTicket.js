@@ -1,8 +1,8 @@
 import Swal from 'sweetalert2';
-export default function claimTicket(id, title, creator, camunda) {
+export default function claimTicket(id, title, creator, desc, camunda) {
     Swal.fire({
         title: `<i>Claiming ticket: ${title}</i>`,
-        html: `Are you sure that you want to claim ticket <strong>${title}</strong> which was created by <strong>${creator}</strong>?`,
+        html: `Are you sure that you want to claim ticket <strong>${title}</strong> which was created by <strong>${creator}</strong> with a <strong> description of </strong><i>"${desc}"</i>?`,
         icon: 'question',
         showCancelButton: true,
         cancelButtonColor: '#ff0000',

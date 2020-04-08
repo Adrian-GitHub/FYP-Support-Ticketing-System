@@ -24,7 +24,7 @@ const register = (req, res) => {
             // Generate random salt
             let salt = crypto.randomBytes(128).toString('base64');
             // Hash the password using the generated salt
-            let hashedPassword = hashPassword(req.body.password, salt);
+            let hashedPassword = User.hashPassword(req.body.password, salt);
             // Create new user
             const newUser = new User({ name: req.body.name, username: req.body.username, password: hashedPassword, salt: salt, isWho: 'admin' });
             // We have the data, user with hashed password. Now send data to mongoDB
@@ -40,12 +40,6 @@ const register = (req, res) => {
         };
     });
 };
-function hashPassword(password, salt){
-     return hashedPassword = crypto.pbkdf2Sync(password, salt, 100000, 512, 'sha512', (err, key) => {
-                    if (err)
-                        throw err;
-                }).toString('hex')
-}
 // New Ticket Creation
 const newTicket = async(req, res) => { // Create new ticket with all data being customised
     // Camunda's ID
@@ -211,7 +205,7 @@ const staffList = (req, res) => {
         res.json({staffData: staffData})
       });
 };
-// Assigns staff to the ticket
+// Allocating the ticket to support staff member
 const assignStaff = (req, res) => {
     // We are receiving ID and NAME of staff and Ticket ID
     // Assign it to the ticket
@@ -227,7 +221,7 @@ const assignStaff = (req, res) => {
         if (err)
             throw err;
         // Else console log for reference that staff was assigned to a ticket by admin
-        console.log("Staff assigned by admin to ticket " + req.body.ticketID);
+        console.log("<PROCESS_MODIFIED>Staff assigned by admin to ticket " + req.body.ticketID);
     });
     // Return status
     res.json({status: 'success'});

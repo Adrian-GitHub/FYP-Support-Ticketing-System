@@ -38,7 +38,7 @@ class Dashboard extends Component {
     saveTicketInstance_save(item){
         this.setState({currentItem: item})
         //Show ticket claim modal
-        claimTicket(item.id, item.title, item.createdBy, item.camundaID);
+        claimTicket(item.id, item.title, item.createdBy, item.desc, item.camundaID);
     }
     saveTicketInstance_open(item){
         this.setState({currentItem: item, viewTicket: true})

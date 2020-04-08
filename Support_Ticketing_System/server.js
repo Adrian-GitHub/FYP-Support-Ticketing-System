@@ -21,10 +21,12 @@ mongoDB.connectToServer( function( err ) {
     // Routes
     const admin = require('./api/routes_admin');
     const client = require('./api/routes_client');
+    const client_ticket = require('./api/routes_client_ticket');
     const support = require("./api/routes_support");
     const login = require("./api/routes_auth");
     app.use("/api/admin", admin);
     app.use("/api/client", client);
+    app.use("/api/ticket", client_ticket);
     app.use("/api/support", support);
     app.use("/api/login", login);
 });

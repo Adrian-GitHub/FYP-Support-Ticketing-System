@@ -23,7 +23,7 @@ const register = (req, res) => { // Form validation
                 // Generate random salt
                 let salt = crypto.randomBytes(128).toString('base64');
                 // Hash the password using the generated salt
-                let hashedPassword = hashPassword(req.body.password, salt);
+                let hashedPassword = User.hashPassword(req.body.password, salt);;
                 // Create new user
                 const newUser = new User({ name: req.body.name, username: req.body.username, password: hashedPassword, salt: salt, isWho: 'client' });
                 // We have the data, user with hashed password. Now send data to mongoDB
@@ -40,12 +40,6 @@ const register = (req, res) => { // Form validation
         });
 };
 
-function hashPassword(password, salt){
-     return hashedPassword = crypto.pbkdf2Sync(password, salt, 100000, 512, 'sha512', (err, key) => {
-                    if (err)
-                        throw err;
-                }).toString('hex')
-}
 // Create new ticket
 const createTicket = async(req, res) => {
     // Camunda's ID
@@ -92,7 +86,7 @@ const createTicket = async(req, res) => {
         if (err)
             throw err;
         // Else console log for reference that new ticket was created by client
-        console.log("New Ticket was created by Client " + username);
+        console.log("<CREATION>New Ticket was created by Client " + username);
         // Assign the value of inserted ID to our variable
         ticketID = res.insertedId;
         const newTicketHistory = new TicketHistory({ticketID: ticketID, records: {staffId: user_id, action: 'Ticket Created by the CLIENT', desc: "Created by "+ name +" (CLIENT'S NAME)", staffName: "CLIENT", date: new Date().toISOString()}});
@@ -111,23 +105,15 @@ const getTickets = (req, res) => {
         res.json({status: 'not_authed'});
         return;
     }
-    var cursor = connection.collection('tickets').find();
+    var cursor = connection.collection('tickets').find({ createdById: { $in: [ user_id ] } });
     // Construct that Data into the object
     const ticketData = [];
-    // Execute the each command, triggers for each document
-    cursor.forEach(function(doc) {
-         // If the item is null then the cursor is empty
-         if(doc == null) {
-            //quit
-            return;
-        }   
-        // If ticket doesn't bear user's id then skip
-        if(doc.createdById !== user_id) {return;}
-          // otherwise, do something with the item
-          // push it to our array
-          ticketData.push(doc);
+    // cursor contains the callee information too, we don't need it, when doing a forEach loop that information is automatically removed
+    cursor.forEach(function(ticket) {
+          // The ticket is already sorted before we entered this loop, so we know it's correct
+          ticketData.push(ticket);
       }, function(err) {
-          //done by error
+          //done by error(when there's no more tickets to go through the error will occur)
           res.json({status: 'success', tickets: ticketData})
       });
 };
