@@ -24,6 +24,7 @@ export async function getAvailableTickets() {
             let tempTickets = [];
             //for each element, push it onto our temp var and then update state with it
             data.tickets.forEach(element => {
+                console.log(element);
                 const date = new Date(element.creationDate).toLocaleString();
                 const status = getStatus(element.status);
                 const comments = element.comments ? element.comments : 'CURRENTLY NONE';

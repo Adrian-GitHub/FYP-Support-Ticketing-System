@@ -45,7 +45,6 @@
     <bpmn:userTask id="Task_0ewg59m" name="Allocate Ticket">
       <bpmn:incoming>SequenceFlow_02dkedz</bpmn:incoming>
       <bpmn:incoming>SequenceFlow_0901f3g</bpmn:incoming>
-      <bpmn:incoming>SequenceFlow_0fy2u40</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_11wb04s</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:sequenceFlow id="SequenceFlow_11wb04s" sourceRef="Task_0ewg59m" targetRef="Task_1gjlki5" />
@@ -78,7 +77,6 @@
       <bpmn:incoming>SequenceFlow_0bmjovw</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_05rdett</bpmn:outgoing>
       <bpmn:outgoing>SequenceFlow_0m1y60w</bpmn:outgoing>
-      <bpmn:outgoing>SequenceFlow_0fy2u40</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:endEvent id="EndEvent_1r7c2hm">
       <bpmn:incoming>SequenceFlow_1npwbt6</bpmn:incoming>
@@ -163,7 +161,7 @@
     <bpmn:boundaryEvent id="IntermediateThrowEvent_1x23gkg" name="Every 30 days close ticket automatically" attachedToRef="UserTask_02y2ifq">
       <bpmn:outgoing>SequenceFlow_1g662yk</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_1qtjqs4">
-        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">R/PT60S</bpmn:timeCycle>
+        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">R/PT30S</bpmn:timeCycle>
       </bpmn:timerEventDefinition>
     </bpmn:boundaryEvent>
     <bpmn:sequenceFlow id="SequenceFlow_1y36tfa" sourceRef="UserTask_0ocgq2n" targetRef="IntermediateThrowEvent_0l28fyl" />
@@ -178,9 +176,6 @@
       <bpmn:incoming>SequenceFlow_1c2j19t</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_1c2j19t" sourceRef="IntermediateThrowEvent_0l28fyl" targetRef="EndEvent_02j0glk" />
-    <bpmn:sequenceFlow id="SequenceFlow_0fy2u40" name="follow up" sourceRef="ExclusiveGateway_1qocw9d" targetRef="Task_0ewg59m">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">#{followUp == 'true'}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
     <bpmn:textAnnotation id="TextAnnotation_15mnvmi">
       <bpmn:text>This is where the ticket is awaiting the allocation process</bpmn:text>
     </bpmn:textAnnotation>
@@ -284,7 +279,7 @@
         <di:waypoint x="740" y="700" />
         <di:waypoint x="740" y="640" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="523" y="683" width="53" height="14" />
+          <dc:Bounds x="549" y="682" width="53" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_02dkedz_di" bpmnElement="SequenceFlow_02dkedz">
@@ -303,7 +298,7 @@
       <bpmndi:BPMNShape id="ExclusiveGateway_1qocw9d_di" bpmnElement="ExclusiveGateway_1qocw9d" isMarkerVisible="true">
         <dc:Bounds x="1355" y="575" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1351" y="635" width="58" height="14" />
+          <dc:Bounds x="1351" y="551" width="58" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EndEvent_1r7c2hm_di" bpmnElement="EndEvent_1r7c2hm" bioc:stroke="rgb(229, 57, 53)" bioc:fill="rgb(255, 205, 210)">
@@ -403,11 +398,11 @@
         <di:waypoint x="1160" y="140" />
         <di:waypoint x="1160" y="50" />
         <di:waypoint x="1740" y="50" />
-        <di:waypoint x="1740" y="890" />
-        <di:waypoint x="760" y="890" />
+        <di:waypoint x="1740" y="830" />
+        <di:waypoint x="760" y="830" />
         <di:waypoint x="760" y="640" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1745" y="201" width="90" height="66" />
+          <dc:Bounds x="1745" y="188" width="90" height="66" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0901f3g_di" bpmnElement="SequenceFlow_0901f3g">
@@ -485,17 +480,6 @@
       <bpmndi:BPMNEdge id="SequenceFlow_1c2j19t_di" bpmnElement="SequenceFlow_1c2j19t">
         <di:waypoint x="1358" y="780" />
         <di:waypoint x="1442" y="780" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_0fy2u40_di" bpmnElement="SequenceFlow_0fy2u40" bioc:stroke="rgb(142, 36, 170)" bioc:fill="rgb(225, 190, 231)">
-        <di:waypoint x="1380" y="575" />
-        <di:waypoint x="1380" y="520" />
-        <di:waypoint x="1730" y="520" />
-        <di:waypoint x="1730" y="710" />
-        <di:waypoint x="600" y="710" />
-        <di:waypoint x="600" y="640" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1548" y="503" width="44" height="14" />
-        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

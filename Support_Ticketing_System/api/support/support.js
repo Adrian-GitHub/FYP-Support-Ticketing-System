@@ -116,7 +116,6 @@ const ClaimTicket = async(req, res) => {
         })
         .then(res => res.json())
         .then(json => Camunda_ID = json[0].id).catch((err) => console.log(err));
-
     await fetch(`http://localhost:8080/engine-rest/task/${Camunda_ID}/complete`, {
         method: 'POST',
         body: JSON.stringify(requestBody),  //client

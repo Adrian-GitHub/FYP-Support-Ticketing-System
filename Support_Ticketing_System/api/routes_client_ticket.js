@@ -18,5 +18,7 @@ router.post("/GetTickets", client.getTickets);
 router.post("/CloseTicket", client.closeTicket);
 // Submits more information regarding "more information" topic as asked by staff member
 router.post("/SubmitMoreInformation", client.submitMoreInformation);
+// Follow-up the ticket
+router.post("/FollowUpTicket", client.followUp);
 
 module.exports = router;

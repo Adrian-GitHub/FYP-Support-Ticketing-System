@@ -131,6 +131,40 @@ class Dashboard extends Component {
             }
           })        
     }
+    followUp(){
+        Swal.fire({
+            title: 'Are you sure you want to follow up this ticket?',
+            text: "Please say what's wrong",
+            icon: 'question',
+            input: 'text',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'You need to write something!';
+                }
+            },
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Submit'
+          }).then((result) => {
+            if (result.value) {
+                fetch('/api/ticket/FollowUpTicket', {
+                    method: 'POST',
+                    body: JSON.stringify({id: this.state.currentItem.id, message: result.value, camundaID: this.state.currentItem.camundaID}),
+                    headers: {
+                      "Content-Type": "application/json"
+                    }
+                  }).then((res) => res.json()).then((data) => {
+                     if(data.status === 'success'){
+                         Swal.fire('Success!', 'Information submitted.', 'success');
+                         window.location.reload();
+                     }
+                  }).catch((error) => {
+                    console.log(error);
+                  });                
+            }
+          })        
+    }
     viewTicket(item){
         this.setState({currentItem: item})
     }
@@ -145,8 +179,10 @@ class Dashboard extends Component {
         // 14. Cancel by user 15. Cancel abandoned ticket
         let cancellation = false;
         let submitMore = false;
+        let followUp = false;
         if(this.state.currentItem.status === 'Ticket Opened' || this.state.currentItem.status === 'More info needed') cancellation = true;
         if(this.state.currentItem.status === 'More info needed') submitMore = true;
+        if(this.state.currentItem.status === 'Ticket Solved') followUp = true;
       return (
         <div className="dashboard">
             <div className="split left">
@@ -200,6 +236,7 @@ class Dashboard extends Component {
                         <div className="button-toolbar centered">
                             {submitMore && <Button onClick={() => this.submitMoreInformation()}>SUBMIT MORE INFORMATION</Button> }
                             {cancellation && <Button variant="danger" onClick={() => this.closeTicket()}>CLOSE TICKET</Button> }
+                            {followUp && <Button onClick={() => this.followUp()}>FOLLOW-UP TICKET</Button> }
                         </div>
                     </div>
                 </div>

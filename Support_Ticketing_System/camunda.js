@@ -149,9 +149,13 @@ const closeBySupport_HANDLER = async ({ task, taskService }) => {
     console.log(error);
   });
   // Finally, complete the task
-  await taskService.complete(task);
-  // Report back
-  console.log('Ticket was closed successfully by Staff member.');
+  try {
+      await taskService.complete(task);
+        // Report back
+        console.log('Ticket was closed successfully by Staff member.');
+  } catch (error) {
+    console.error(error);
+  }
 };
 const closeExpiredTicket_HANLDER = async ({ task, taskService }) => {
   // The ticket is expired, that's either done by the staff member or automatically by the engine
