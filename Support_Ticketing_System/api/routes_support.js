@@ -23,6 +23,7 @@ router.post("/SuspendTicket", support.SuspendTicket);
 router.post("/CloseTicket", support.CloseTicket);
 router.post("/CloseExpiredTicket", support.CloseExpiredTicket);
 router.post("/CloseAbandonedTicket", support.CloseAbandonedTicket);
+router.post("/CloseAbandonedTicket_AUTO", support.CloseAbandonedTicket_AUTO);
 router.post("/SolveTicket", support.SolveTicket);
 router.post("/ReallocateTicket", support.ReallocateTicket);
 router.post("/OpenTicketOnBehalf", support.OpenTicketOnBehalf);

@@ -42,54 +42,19 @@ const register = (req, res) => { // Form validation
 
 // Create new ticket
 const createTicket = async(req, res) => {
-    // Camunda's ID
-    let Camunda_ID;
     // Ticket ID will be populated later
     let ticketID;
-    const username = req.cookies['username'];
-    const name = req.cookies['name'];
-    const user_id = req.cookies['user_id'];
-
-    //**
-    // Before proceeding futher, send this task to the Camunda engine to start a process instance there
-    // The reason for await is that we want to wait here, we don't neccessarily rely on the data from Camunda itself.
-    // This function will return us executionID which is the ID of the task started. We will store it along with the ticket
-    // so that we can refer to it later on and move with the process instance later on
-    //**
-    const requestBody =  {
-        "variables": {
-          "theOpeningEntity": {"value":"true","type":"String"} // true for client
-        }
-    };
-    await fetch('http://localhost:8080/engine-rest/process-definition/key/TicketingSystem/start', {
-        method: 'POST',
-        body: JSON.stringify(requestBody),  //client
-        headers: { 'Content-Type': 'application/json' },
-    })
-    .then(res => res.json())
-    .then(json => Camunda_ID = json.id).catch((err) => console.log(err));
-
-     // THE ID returned to us by Camunda isn't the ID we're looking for because that ID only allows us to lookup the task not modify it
-     // Making 2nd call to get the actual ID and overwriting the Camunda_ID with the correct one
-
-    await fetch(`http://localhost:8080/engine-rest/task?processInstanceId=${Camunda_ID}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-    })
-    .then(res => res.json())
-    .then(json => Camunda_ID = json[0].processInstanceId).catch((err) => console.log(err));
-
-    const newTicket = new Ticket({camundaID: Camunda_ID, title: req.body.ticketTitle, desc: req.body.ticketDesc, createdBy: username, createdById: user_id , currentSupportStaff: 'free', status: 1});
+    const newTicket = new Ticket({camundaID: req.body.camundaID, title: req.body.ticketTitle, desc: req.body.ticketDesc, createdBy: req.body.username, createdById: req.body.user_id , currentSupportStaff: 'free', status: 1});
     // Open DB and then insert new ticket using Ticket Model defined
     connection.collection("tickets").insertOne(newTicket, function (err, res) {
         // If something went wrong, throw the error
         if (err)
             throw err;
         // Else console log for reference that new ticket was created by client
-        console.log("<CREATION>New Ticket was created by Client " + username);
+        console.log("<CREATION>New Ticket was created by Client " + req.body.username);
         // Assign the value of inserted ID to our variable
         ticketID = res.insertedId;
-        const newTicketHistory = new TicketHistory({ticketID: ticketID, records: {staffId: user_id, action: 'Ticket Created by the CLIENT', desc: "Created by "+ name +" (CLIENT'S NAME)", staffName: "CLIENT", date: new Date().toISOString()}});
+        const newTicketHistory = new TicketHistory({ticketID: ticketID, records: {staffId: req.body.user_id, action: 'Ticket Created by the CLIENT', desc: "Created by "+ req.body.name +" (CLIENT'S NAME)", staffName: "CLIENT", date: new Date().toISOString()}});
         connection.collection("ticketHistory").insertOne(newTicketHistory);
         console.log("<PROCESS_MODIFIED>New Ticket was created by Client");
     });   
@@ -98,14 +63,13 @@ const createTicket = async(req, res) => {
 // Get All Tickets belonging to this user
 const getTickets = (req, res) => {
     const username = req.cookies['username'];
-    const user_id = req.cookies['user_id'];
     if(!username)// if username is not defined
     {
         //User is not authed properly then
         res.json({status: 'not_authed'});
         return;
     }
-    var cursor = connection.collection('tickets').find({ createdById: { $in: [ user_id ] } });
+    var cursor = connection.collection('tickets').find({ createdBy: { $in: [ username ] } });
     // Construct that Data into the object
     const ticketData = [];
     // cursor contains the callee information too, we don't need it, when doing a forEach loop that information is automatically removed

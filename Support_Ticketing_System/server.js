@@ -23,11 +23,13 @@ mongoDB.connectToServer( function( err ) {
     const client = require('./api/routes_client');
     const client_ticket = require('./api/routes_client_ticket');
     const support = require("./api/routes_support");
+    const camunda = require("./api/routes_camunda");
     const login = require("./api/routes_auth");
     app.use("/api/admin", admin);
     app.use("/api/client", client);
     app.use("/api/ticket", client_ticket);
     app.use("/api/support", support);
+    app.use("/api/camunda", camunda);
     app.use("/api/login", login);
 });
 

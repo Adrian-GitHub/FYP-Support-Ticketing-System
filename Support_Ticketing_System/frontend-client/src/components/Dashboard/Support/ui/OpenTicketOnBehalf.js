@@ -48,7 +48,7 @@ class newTicket extends Component {
         // We're here that means that the title is valid
         else{
             //Create a ticket
-            fetch('/api/support/OpenTicketOnBehalf', {
+            fetch('/api/camunda/CreateTicketOnBehalf', {
                 method: 'POST',
                 body: JSON.stringify({ticketTitle: ticketTitle, ticketDesc: ticketDesc, onBehalf: ticketBehalf }),
                 headers: {
@@ -89,7 +89,7 @@ class newTicket extends Component {
                 <Input id="ticketDesc" prefix={<Icon type="book" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Description of a ticket" onChange={this.onChange}/>
                 </Form.Item>
                 <Form.Item label="On behalf of">
-                <Input id="ticketBehalf" prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="On Behalf of" onChange={this.onChange}/>
+                <Input id="ticketBehalf" prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="On Behalf of USERNAME" onChange={this.onChange}/>
                 </Form.Item>
                 <Form.Item wrapperCol={{ span: 12, offset: 5 }}>
                 <Button type="primary" htmlType="submit">

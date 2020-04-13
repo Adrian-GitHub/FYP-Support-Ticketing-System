@@ -29,7 +29,7 @@ class newTicket extends Component {
         // We're here that means that the title is valid
         else{
             //Create a ticket
-            fetch('/api/ticket/CreateTicket', {
+            fetch('/api/camunda/CreateTicket', {
                 method: 'POST',
                 body: JSON.stringify({ticketTitle: this.state.ticketTitle, ticketDesc: this.state.ticketDesc}),
                 headers: {

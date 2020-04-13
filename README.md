@@ -13,6 +13,7 @@ The main system is divided into sub-folders which are spread-out throughout the 
     ├── ├── auto-test.js                     # Automated testing file
     ├── ├── *.**                             # All back-end files excluding front-end folder
     ├── ├── frontend-client                  # Front-end user interface
+    ├── camunda.js                           # Camunda's Worker file
     └── README.md
 
 ## Installation
@@ -53,6 +54,8 @@ After the installation is completed successfully the deliverable should be ready
 ```python
 Pre: Make sure MongoDB is running before starting anything
 ```
+*Before* proceeding further make sure to start the worker for Camunda that's built into this project by typing `npm run camunda-worker` into a **new command line window**. Without running the *worker* you won't be able to use the system fully as worker relies on Camunda's engine and worker tells Camunda what to do when there's incoming task thus Camunda is managing and creating some of the tasks for this project.
+
 Navigate to the main directory which is `Support_Ticketing_System`. Type `npm run both` this will start the back-end and front-end at the same time. Chrome browser is suggested for this project. Once the project starts the browser *should* automatically open itself with address `localhost:3001` loaded into the search bar.
 
 ## Available Commands 

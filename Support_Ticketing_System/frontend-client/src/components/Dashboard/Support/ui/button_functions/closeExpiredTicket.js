@@ -9,7 +9,7 @@ export function closeExpiredTicket(props, camundaID) {
         confirmButtonText: 'Yes'
     }).then((result) => {
         if (!result.dismiss) {
-            fetch('/api/support/CloseExpiredTicket', {
+            fetch('/api/camunda/CloseExpiredTicket', {
                 method: 'POST',
                 body: JSON.stringify({ ticketID: props, camundaID: camundaID }),
                 headers: {

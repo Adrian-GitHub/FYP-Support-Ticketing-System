@@ -9,7 +9,7 @@ export function closeAbandonedTicket(props, camundaID) {
         confirmButtonText: 'Yes'
     }).then((result) => {
         if (!result.dismiss) {
-            fetch('/api/support/CloseAbandonedTicket', {
+            fetch('/api/camunda/CloseAbandonedTicket', {
                 method: 'POST',
                 body: JSON.stringify({ ticketID: props, camundaID: camundaID }),
                 headers: {
