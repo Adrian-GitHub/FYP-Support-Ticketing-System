@@ -51,7 +51,9 @@ const GetMyTickets = (req, res) => {
         res.json({level: 'nope'});
         return;
     }
-    var cursor = connection.collection('tickets').find();
+    // Find ALL TICKETS where STAFFID is equal to USER_ID and status is NOT EQUAL to 11 or 12 or 13 or 14 or 15 (this statuses indicate expired ticket)
+    // Support attendant doesn't need to see this kind of information
+    var cursor = connection.collection('tickets').find({ staffId: { $in: [ user_id ] }, status: { $nin: [11, 12, 13, 14, 15] } });
     // Construct that Data into the object
     const ticketData = [];
     // Execute the each command, triggers for each document
@@ -61,31 +63,27 @@ const GetMyTickets = (req, res) => {
             //quit
             return;
         }   
-        // If ticket doesn't bear support's staff ID then skip
-        const id = doc.staffId;
-        if(id === user_id) {ticketData.push(doc)}
-          // otherwise, do something with the item
-          // push it to our array
-        else return;
+        // push it to our array
+        else ticketData.push(doc)
       }, function(err) {
           //done by error
           res.json({status: 'success', tickets: ticketData})
-      });
+        });
 };
 const GetAvailableTickets = (req, res) => {
-    var cursor = connection.collection('tickets').find();
+    // Check for all tickets that are saved with status of staffId equivalent to FREE
+    var cursor = connection.collection('tickets').find({ staffId: { $in: [ 'free' ] } });
     // Construct that Data into the object
     const ticketData = [];
     // Execute the each command, triggers for each document
+    // The reason why we're doing this is that the cursor contains definition of a call which isn't a JSON object itself
+    // When we loop it through `forEach` this data is deleted as it ain't a part of it. Although a raw cursor data contains call log by default
     cursor.forEach(function(doc) {
          // If the item is null then the cursor is empty
          if(doc == null) {
             //quit
             return;
         }   
-        // 'free' means that ticket can be claimed
-        if(doc.staffId !== 'free') {return;}
-          // otherwise, do something with the item
           // push it to our array
           ticketData.push(doc);
       }, function(err) {
@@ -211,7 +209,8 @@ const CloseTicket = async(req, res) => {
     });
       //History
       connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {date: new Date().toISOString(), staffId: req.body.user_id, action: 'Ticket Closed', desc: "Ticket Closed by Staff member ", staffName: req.body.name}}});
-      console.log("<PROCESS_MODIFIED>Support Staff member closed a ticket.");
+      if(req.body.reason === 'close') console.log("<PROCESS_MODIFIED>Support Staff member closed a ticket.");
+      else if(req.body.reason === 'cancel') console.log("<PROCESS_MODIFIED>Support Staff member cancelled a ticket.");
     res.json({status: 'success'});
 };
 const CloseExpiredTicket = async(req, res) => {

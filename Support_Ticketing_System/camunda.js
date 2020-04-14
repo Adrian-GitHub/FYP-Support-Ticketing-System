@@ -141,7 +141,7 @@ const closeBySupport_HANDLER = async ({ task, taskService }) => {
 
    fetch('http://localhost:3001/api/support/CloseTicket', {
     method: 'POST',
-    body: JSON.stringify({ticketID: ticketID, user_id: user_id, name: name}),
+    body: JSON.stringify({ticketID: ticketID, user_id: user_id, name: name, reason: "close"}),
     headers: {
       "Content-Type": "application/json"
     }
@@ -200,6 +200,26 @@ const closeExpiredTicket_HANLDER = async ({ task, taskService }) => {
   }
 
 };
+const cancelBySupport_HANDLER = async ({ task, taskService }) => {
+  const name = task.variables.get("closedBy_name");
+  const user_id = task.variables.get("closedBy_user_id");
+  const ticketID = task.variables.get("ticketID");
+  fetch('http://localhost:3001/api/support/CloseTicket', {
+   method: 'POST',
+   body: JSON.stringify({ticketID: ticketID, user_id: user_id, name: name, reason: "cancel"}),
+   headers: {
+     "Content-Type": "application/json"
+   }
+ }).catch((error) => {
+   console.log(error);
+ });
+ try {
+     await taskService.complete(task);
+       console.log('Ticket was cancelled successfully by Staff member.');
+ } catch (error) {
+   console.error(error);
+ }
+};
 
 // susbscribe to the topic 'newTicketCreation' & provide the created handler
 client.subscribe("newTicketCreation", ticketCreation_HANDLER);
@@ -208,3 +228,4 @@ client.subscribe("openTicket", openTicket_HANDLER);
 client.subscribe("abandonedTicket", abandonedTicket_HANDLER);
 client.subscribe("closeBySupport", closeBySupport_HANDLER);
 client.subscribe("closeExpiredTicket", closeExpiredTicket_HANLDER);
+client.subscribe("cancelBySupport", cancelBySupport_HANDLER)
