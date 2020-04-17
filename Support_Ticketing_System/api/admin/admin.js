@@ -281,6 +281,27 @@ const askForMoreInformation = (req, res) => {
     });
     res.json({status: 'success'});
 };
+// TESTING ONLY API ROUTE
+const EraseAll = (req, res) => {
+    // Security Check to see if request was sent BY LOCALHOST not USER
+    // JEST is working offline.
+    //users tickets ticketHistory
+    if(req.connection.remoteAddress === '::ffff:127.0.0.1'){
+        connection.dropCollection("users", function(err, delOK) {
+            if (err) throw err;
+            if (delOK) console.log("Collection USERS deleted");
+        });
+        connection.dropCollection("tickets", function(err, delOK) {
+            if (err) throw err;
+            if (delOK) console.log("Collection TICKETS deleted");
+        });
+        connection.dropCollection("ticketHistory", function(err, delOK) {
+            if (err) throw err;
+            if (delOK) console.log("Collection TICKET_HISTORY deleted");
+        });
+    }
+    res.json({status: 'done'});
+};
 
 module.exports = router;
 module.exports.register = register;
@@ -293,5 +314,6 @@ module.exports.changeStatus = changeStatus;
 module.exports.deleteTicket = deleteTicket;
 module.exports.deleteUser = deleteUser;
 module.exports.askForMoreInformation = askForMoreInformation;
+module.exports.EraseAll = EraseAll;
 
 

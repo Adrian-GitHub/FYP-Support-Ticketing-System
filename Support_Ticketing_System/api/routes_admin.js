@@ -34,4 +34,7 @@ router.post('/AssignStaff', admin.assignStaff);
 // Removes the staff member from the database or client.
 router.post('/DeleteUser', admin.deleteUser);
 
+// TESTING ROUTE FOR DB CLEANING. ONLY ACCESSIBLE VIA JEST (TESTING.TEST.JS FILE)
+router.post('/Erase_All', admin.EraseAll);
+
 module.exports = router;

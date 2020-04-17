@@ -86,134 +86,143 @@ describe('Close and Clean the database', () => {
 });
 // Test the back-end API, ADMIN/CLIENT
 describe('BACK-END API TESTING', function() {
+  describe('Admin API', () => {
+    it('Registration', (done) => {
+      request(app)
+          .post('/api/admin/Register')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .send({ name: 'backend_admin2', username: 'bckend_admin2', password: 'admin1' })
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .expect(function(response) {
+             expect(response.body).not.to.be.empty;
+             expect(response.body).to.be.an('object')
+             expect(response.body).to.have.deep.property('username', 'Username is free');
+          })
+          .end(done);
+    });
 
-  // describe('Admin API', () => {
-  //   it('Registration', (done) => {
-  //     request(app)
-  //         .post('/api/admin/Register')
-  //         .set('Accept', 'application/json')
-  //         .set('Content-Type', 'application/json')
-  //         .send({ name: 'backend_admin2', username: 'bckend_admin2', password: 'admin1' })
-  //         .expect(200)
-  //         .expect('Content-Type', /json/)
-  //         .expect(function(response) {
-  //            expect(response.body).not.to.be.empty;
-  //            expect(response.body).to.be.an('object')
-  //            expect(response.body).to.have.deep.property('username', 'Username is free');
-  //         })
-  //         .end(done);
-  //   });
+    it('Registration with same details(pass means fail)', (done) => {
+      request(app)
+          .post('/api/admin/Register')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .send({ name: 'backend_admin2', username: 'bckend_admin2', password: 'admin1' })
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .expect(function(response) {
+             expect(response.body).not.to.be.empty;
+             expect(response.body).to.be.an('object')
+             expect(response.body).to.have.deep.property('username', 'Username_taken');
+          })
+          .end(done);
+    });
 
-  //   it('Registration with same details(pass means fail)', (done) => {
-  //     request(app)
-  //         .post('/api/admin/Register')
-  //         .set('Accept', 'application/json')
-  //         .set('Content-Type', 'application/json')
-  //         .send({ name: 'backend_admin2', username: 'bckend_admin2', password: 'admin1' })
-  //         .expect(200)
-  //         .expect('Content-Type', /json/)
-  //         .expect(function(response) {
-  //            expect(response.body).not.to.be.empty;
-  //            expect(response.body).to.be.an('object')
-  //            expect(response.body).to.have.deep.property('username', 'Username_taken');
-  //         })
-  //         .end(done);
-  //   });
+    it('Authentication', (done) => {
+        request(app)
+          .post('/api/login/Login')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .send({ username: 'bckend_admin2', password: 'admin1' })
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .expect(function(response) {
+            expect(response.body).not.to.be.empty;
+            expect(response.body).to.be.an('object')
+            expect(response.body).to.have.deep.property('status', 'Authed_admin')
+          })
+          .end(done);
+    });
 
-  //   it('Authentication', (done) => {
-  //     request(app)
-  //       .post('/api/login/Login')
-  //       .set('Accept', 'application/json')
-  //       .set('Content-Type', 'application/json')
-  //       .send({ username: 'bckend_admin1', password: 'admin1' })
-  //       .expect(200)
-  //       .expect('Content-Type', /json/)
-  //       .expect(function(response) {
-  //         expect(response.body).not.to.be.empty;
-  //         expect(response.body).to.be.an('object')
-  //         expect(response.body).to.have.deep.property('status', 'Authed_admin')
-  //       })
-  //       .end(done);
-  //   });
+    it('Authentication using invalid data', (done) => {
+      request(app)
+        .post('/api/login/Login')
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .send({ title: 'test_ticket', createdBy: 'bckend_admin', description: 'Test ticket created by testing suite', ticketState: '5', currentStaff: 'admin' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(function(response) {
+          expect(response.body).not.to.be.empty;
+          expect(response.body).to.be.an('object')
+          expect(response.body).to.have.deep.property('status', 'Not_Authed')
+        })
+        .end(done);
+    });
 
-  //   it('Authentication using invalid data', (done) => {
-  //     request(app)
-  //       .post('/api/login/Login')
-  //       .set('Accept', 'application/json')
-  //       .set('Content-Type', 'application/json')
-  //       .send({ title: 'test_ticket', createdBy: 'bckend_admin', description: 'Test ticket created by testing suite', ticketState: '5', currentStaff: 'admin' })
-  //       .expect(200)
-  //       .expect('Content-Type', /json/)
-  //       .expect(function(response) {
-  //         expect(response.body).not.to.be.empty;
-  //         expect(response.body).to.be.an('object')
-  //         expect(response.body).to.have.deep.property('status', 'Not_Authed')
-  //       })
-  //       .end(done);
-  //   });
+  });
 
-  // });
+  describe('Client API', () => {
+    it('Registration', (done) => {
+      request(app)
+          .post('/api/client/Register')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .send({ name: 'client1', username: 'client1', password: 'client1' })
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .expect(function(response) {
+             expect(response.body).not.to.be.empty;
+             expect(response.body).to.be.an('object')
+             expect(response.body).to.have.deep.property('username', 'Username is free');
+          })
+          .end(done);
+    });
 
-  // describe('Client API', () => {
-  //   it('Registration', (done) => {
-  //     request(app)
-  //         .post('/api/client/Register')
-  //         .set('Accept', 'application/json')
-  //         .set('Content-Type', 'application/json')
-  //         .send({ name: 'client1', username: 'client1', password: 'client1' })
-  //         .expect(200)
-  //         .expect('Content-Type', /json/)
-  //         .expect(function(response) {
-  //            expect(response.body).not.to.be.empty;
-  //            expect(response.body).to.be.an('object')
-  //            expect(response.body).to.have.deep.property('username', 'Username is free');
-  //         })
-  //         .end(done);
-  //   });
+    it('Registration with same details(pass means fail)', (done) => {
+      request(app)
+          .post('/api/client/Register')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .send({ name: 'client1', username: 'client1', password: 'client1' })
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .expect(function(response) {
+             expect(response.body).not.to.be.empty;
+             expect(response.body).to.be.an('object')
+             expect(response.body).to.have.deep.property('username', 'Username_taken');
+          })
+          .end(done);
+    });
 
-  //   it('Registration with same details(pass means fail)', (done) => {
-  //     request(app)
-  //         .post('/api/client/Register')
-  //         .set('Accept', 'application/json')
-  //         .set('Content-Type', 'application/json')
-  //         .send({ name: 'client1', username: 'client1', password: 'client1' })
-  //         .expect(200)
-  //         .expect('Content-Type', /json/)
-  //         .expect(function(response) {
-  //            expect(response.body).not.to.be.empty;
-  //            expect(response.body).to.be.an('object')
-  //            expect(response.body).to.have.deep.property('username', 'Username_taken');
-  //         })
-  //         .end(done);
-  //   });
+    it('Authentication', (done) => {
+      request(app)
+        .post('/api/login/Login')
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .send({ username: 'client1', password: 'client1' })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(function(response) {
+          expect(response.body).not.to.be.empty;
+          expect(response.body).to.be.an('object')
+          expect(response.body).to.have.deep.property('status', 'Authed_client')
+        })
+        .end(done);
+    });
 
-  //   it('Authentication', (done) => {
-  //     request(app)
-  //       .post('/api/login/Login')
-  //       .set('Accept', 'application/json')
-  //       .set('Content-Type', 'application/json')
-  //       .send({ username: 'client1', password: 'client1' })
-  //       .expect(200)
-  //       .expect('Content-Type', /json/)
-  //       .expect(function(response) {
-  //         expect(response.body).not.to.be.empty;
-  //         expect(response.body).to.be.an('object')
-  //         expect(response.body).to.have.deep.property('status', 'Authed_client')
-  //       })
-  //       .end(done);
-  //   });
+    it('Creation of a ticket', (done) => {
+      request(app)
+        .post('/api/ticket/CreateTicket')
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .send({ title: 'test_ticket', createdBy: 'client_Test', description: 'Test ticket created by testing suite', ticketState: '5', currentStaff: 'admin' })
+        .expect(200)        
+        .end(done);
+    });
 
-  //   it('Creation of a ticket', (done) => {
-  //     request(app)
-  //       .post('/api/ticket/CreateTicket')
-  //       .set('Accept', 'application/json')
-  //       .set('Content-Type', 'application/json')
-  //       .send({ title: 'test_ticket', createdBy: 'client_Test', description: 'Test ticket created by testing suite', ticketState: '5', currentStaff: 'admin' })
-  //       // 500 because we aint' using cookies to create this request, so 500 is what API will say although ticket will still be created.
-  //       // The only issue will be with ticket history but for testing we don't need to worry about that because if this works then other functions will do too
-  //       .expect(500)        
-  //       .end(done);
-  //   });
-
-  // });
+  });
+});
+ 
+// Clean the APIs after testing
+describe('CLEANING THE SYSTEM', () => {
+  it('Database cleared', (done) => {
+    request(app)
+    // THIS API ROUTE IS ONLY FOR TESTING, IT IS NOT ACCESSIBLE BY THE MAIN SYSTEM
+    .post('/api/admin/Erase_All')
+    .set('Accept', 'application/json')
+    .expect(200)        
+    .end(done);
+  });
 });

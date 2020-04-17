@@ -133,6 +133,8 @@ const {Builder, By, Key, until} = require('selenium-webdriver');
     // Now Logout
     await driver.sleep(100);
     await (await driver.findElement(By.name('test-logout'))).click();
+    await driver.sleep(500);
+    await (await driver.findElement(By.className('swal2-confirm swal2-styled'))).click();
   } finally {
     // Close it
     await driver.quit();
