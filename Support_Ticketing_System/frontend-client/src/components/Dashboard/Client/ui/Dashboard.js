@@ -49,8 +49,7 @@ class Dashboard extends Component {
                 const status = getStatus(element.status);
                 let staff;
                 if(element.currentSupportStaff === 'free'){ staff = 'NOT YET TAKEN'} else staff = element.currentSupportStaff;
-                const comments = element.comments ? element.comments : 'CURRENTLY NONE';
-                const commentsAuthor = element.commentsAuthor ? element.commentsAuthor : ''
+                const commentedAt = element.commentedAt ? new Date(element.commentedAt).toLocaleString() : '';
                     tempTickets.push({
                         id: element._id,
                         title: element.title,
@@ -58,11 +57,13 @@ class Dashboard extends Component {
                         dateCreated: date,
                         staff: staff,
                         status: status,
-                        commentsAuthor: commentsAuthor,
-                        comments: comments,
+                        commentedAt: commentedAt,
+                        commentAuthor: element.commentBy,
+                        comment: element.comment,
                         camundaID: element.camundaID
                     });
-                    this.setState({tickets: tempTickets});
+                    // Reverse'd becaused first one is last one.
+                    this.setState({tickets: tempTickets.reverse()});
                 });
              }
           }).catch((error) => {
@@ -180,7 +181,7 @@ class Dashboard extends Component {
         let cancellation = false;
         let submitMore = false;
         let followUp = false;
-        if(this.state.currentItem.status === 'Ticket Opened' || this.state.currentItem.status === 'More info needed') cancellation = true;
+        if(this.state.currentItem.status === 'Ticket Opened' || this.state.currentItem.status === 'More info needed' || this.state.currentItem.status === 'Ticket Behalf') cancellation = true;
         if(this.state.currentItem.status === 'More info needed') submitMore = true;
         if(this.state.currentItem.status === 'Ticket Solved') followUp = true;
       return (
@@ -190,7 +191,7 @@ class Dashboard extends Component {
                     <h2 className="headerLeft">YOUR TICKETS</h2>
                     <div>
                     <List
-                    header={<div className="tixHeader">Tickets created by you</div>}
+                    header={<div className="tixHeader">Tickets created by you(<i>latest = first</i>)</div>}
                     bordered
                     dataSource={this.state.tickets}
                     renderItem={item => (
@@ -222,17 +223,18 @@ class Dashboard extends Component {
                         <p className="ticketDesc"><span className="ticketDescHeader">Ticket Desc</span>: {this.state.currentItem.desc}</p>
                         <span className="curStaff">Staff Member assigned to it: <span className="currentStaffHeader">{this.state.currentItem.staff}</span></span>
                         <span className="status">The status of the ticket is : <Badge count={this.state.currentItem.status} style={{ backgroundColor: '#52c41a' }} /></span>
-                        <div className="commentsContainer">
-                            <h6 className="staff-comments">Comments by staff:</h6>
+                        {this.state.currentItem.commentAuthor && <div className="commentsContainer">
+                            <h6 className="staff-comments">Comment by staff:</h6>
                             <Comment
-                                author={<span>{this.state.currentItem.commentsAuthor}</span>}
+                                author={<span>Staff's Name: {this.state.currentItem.commentAuthor}</span>}
                                 content={
-                                <p>
-                                    {this.state.currentItem.comments}
-                                </p>
+                                <div>
+                                    <div>{this.state.currentItem.comment}</div>
+                                    <i style={{position: 'absolute'}}>Date: {this.state.currentItem.commentedAt}</i>
+                                </div>
                                 }
                             />
-                        </div>
+                        </div> }
                         <div className="button-toolbar centered">
                             {submitMore && <Button onClick={() => this.submitMoreInformation()}>SUBMIT MORE INFORMATION</Button> }
                             {cancellation && <Button variant="danger" onClick={() => this.closeTicket()}>CLOSE TICKET</Button> }

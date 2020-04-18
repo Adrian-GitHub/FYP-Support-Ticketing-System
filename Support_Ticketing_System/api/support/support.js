@@ -128,11 +128,11 @@ const ClaimTicket = async(req, res) => {
 const AskForMoreInformation = async(req, res) => {
     const name = req.cookies['name'];
     const user_id = req.cookies['user_id'];
-    connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 10}}, (err, res) => {
+    connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 10, "comment": req.body.ticketDesc, "commentBy": name, "commentedAt": new Date().toISOString() }}, (err, res) => {
         if(err) throw err;
     });
     //History
-    connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {date: new Date().toISOString(), staffId: user_id, action: 'Asked for more information', desc: "Staff requires more information from you ", staffName: name}}});
+    connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {date: new Date().toISOString(), staffId: user_id, action: 'Asked for more information', desc: "Staff asked for more information ", staffName: name}}});
     console.log("<PROCESS_MODIFIED>Support Staff member asked for more information about ticket.");
 
 
@@ -248,7 +248,7 @@ const SolveTicket = async(req, res) => {
     const name = req.cookies['name'];
     const user_id = req.cookies['user_id'];
     
-    connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 7}}, (err, res) => {
+    connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"status": 7, "comment": req.body.ticketDesc, "commentBy": name, "commentedAt": new Date().toISOString()}}, (err, res) => {
         if(err) throw err;
     });
 
@@ -326,7 +326,7 @@ const OpenTicketOnBehalf = async(req, res) => {
         // Ticket ID will be populated later
         let ticketID_db;
         // Should be incoming via body from camunda
-        const newTicket = new Ticket({camundaID: req.body.proc_Camunda_ID, title: req.body.ticketTitle, desc: req.body.description, createdBy: req.body.onBehalf, createdById: req.body.user_id , currentSupportStaff: req.body.username, staffId: req.body.user_id, status: 2});
+        const newTicket = new Ticket({camundaID: req.body.proc_Camunda_ID, title: req.body.ticketTitle, desc: req.body.ticketDesc, createdBy: req.body.onBehalf, createdById: req.body.user_id , currentSupportStaff: req.body.username, staffId: req.body.user_id, status: 2});
         connection.collection("tickets").insertOne(newTicket, function (err, res) {
             if (err)
                 throw err;
