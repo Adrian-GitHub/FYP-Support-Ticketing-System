@@ -72,6 +72,7 @@ $ npm test
 ````
 
 Testing the project the way would user/support interact with it (See chapter below on how to set this up)
+*Pre*: As this testing is using the actual project to run, the project needs be fully started before testing.
 ````
 $ npm auto-test
 ````

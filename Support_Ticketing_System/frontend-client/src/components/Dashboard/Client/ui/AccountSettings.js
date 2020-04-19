@@ -115,7 +115,7 @@ class AccountSettings extends Component {
     return (
       <div>
           <div>
-            <Navi user={'hieee'}/>
+            <Navi user={document.cookie.replace(/(?:(?:^|.*;\s*)name\s*=\s*([^;]*).*$)|^.*$/, "$1")}/>
             <div className="centered">
             <span>This is the data we hold about you</span>
             <div className="userData">

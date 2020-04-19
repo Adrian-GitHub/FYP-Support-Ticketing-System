@@ -92,7 +92,6 @@ const abandonedTicket_HANDLER = async ({ task, taskService }) => {
     try {
       // 2.0 get proc id before its removed from the system
       const proc_id = task.processInstanceId;
-      console.log(task.variables.getAll());
       // 1.1 Complete the task
       await taskService.complete(task);
       // 2. We let the database know that such occurrance happened; we will send camundaID to lookup the ticket(ID IS ALWAYS UNIQUE)

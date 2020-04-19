@@ -26,7 +26,6 @@ class ViewTicket extends Component {
     componentDidMount(){
       this.setState({ticketHistory: []})
       const id = this.props.ticket.id;
-      console.log(id)
       fetch('/api/support/GetTicketHistory', {
         method: 'POST',
         body: JSON.stringify({ticketID: id}),
@@ -34,7 +33,6 @@ class ViewTicket extends Component {
           "Content-Type": "application/json"
         }
       }).then((res) => res.json()).then((data) => {
-          console.log(data);
           //temp var
           let dbData = [];
           // data from callback
@@ -82,7 +80,7 @@ class ViewTicket extends Component {
     
     // Decide which buttons to show
     // Stage 5
-    if(this.props.ticket.status === 'Ticket Opened' || this.props.ticket.status ==='Ticket Behalf' || this.props.ticket.status === 'Ticket Checked') {
+    if(this.props.ticket.status === 'Ticket Opened' || this.props.ticket.status ==='Ticket Behalf' || this.props.ticket.status === 'Ticket Checked' || this.props.ticket.status === 'Allocated to Support' || this.props.ticket.status === 'Ticket reallocated') {
       suspendTicket_boolean = false;
       reallocTicket_boolean = false;
       solveTicket_boolean = false;

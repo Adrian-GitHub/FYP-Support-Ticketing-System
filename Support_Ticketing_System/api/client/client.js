@@ -208,7 +208,7 @@ const followUp = async(req, res) => {
     // 0. Get the required variables
     const ticketID = req.body.id;
     const message = req.body.message;
-    console.log(message)
+    console.log('<PROCESS_MODIFIED>Client has submitted extra information' + message + 'to ticket with ID ' + ticketID);
       // 1. Update the ticket's status to that it is opened again
       connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(ticketID)} ,{"$set": {"status": Number(3), "staffId": "free", "desc": message}});
       // 2. Update the ticket's details. This is a follow-up request
@@ -228,7 +228,6 @@ const followUp = async(req, res) => {
                     "ticketID": {"value": `${ticketID}`,"type":"String"} // Ticket ID used by Camunda
             }
         };
-        console.log(Camunda_ID);
         await fetch(`http://localhost:8080/engine-rest/task/${Camunda_ID}/complete`, {
         method: 'POST',
         body: JSON.stringify(requestBody),
