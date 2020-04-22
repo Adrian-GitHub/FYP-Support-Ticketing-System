@@ -117,7 +117,7 @@ const changePassword = (req, res) => {
     let salt, hashedPassword;
     try{
         salt = crypto.randomBytes(128).toString('base64');
-        hashedPassword = hashPassword(req.body.password.toString(), salt);
+        hashedPassword = User.hashPassword(req.body.password.toString(), salt);
     } catch{}
     connection.collection("users").findOneAndUpdate({"username": username} ,{"$set": {"password": hashedPassword, "salt": salt}}, (err, res) => {
         if(err) throw err;
