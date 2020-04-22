@@ -8,9 +8,9 @@ import Swal from 'sweetalert2';
 
 const data = [
   {
-      title: 'LOADING YOUR TICKETS',
-      desc: 'PLEASE BEAR WITH US',
-      dateCreated: 'IT WON\'T TAKE LONG'
+      title: 'NO TICKETS AVAILABLE',
+      desc: 'PLEASE EITHER CREATE ONE YOURSELF OR CONTACT SUPPORT',
+      dateCreated: `${new Date().toLocaleString()}`,
   },
 ];
 class Dashboard extends Component {
@@ -218,7 +218,7 @@ class Dashboard extends Component {
                     <div className="headerInnerRight">
                         <h5>IF EMPTY, CLICK ON THE LEFT TO LOAD THE TICKET</h5>
                     </div>
-                    <div className="ticketView">
+                    {this.state.currentItem.status && <div className="ticketView">
                         <h4>Ticket Title: {this.state.currentItem.title}</h4>
                         <p className="ticketDesc"><span className="ticketDescHeader">Ticket Desc</span>: {this.state.currentItem.desc}</p>
                         <span className="curStaff">Staff Member assigned to it: <span className="currentStaffHeader">{this.state.currentItem.staff}</span></span>
@@ -240,7 +240,7 @@ class Dashboard extends Component {
                             {cancellation && <Button variant="danger" onClick={() => this.closeTicket()}>CLOSE TICKET</Button> }
                             {followUp && <Button onClick={() => this.followUp()}>FOLLOW-UP TICKET</Button> }
                         </div>
-                    </div>
+                    </div>}
                 </div>
             </div>
         </div>
