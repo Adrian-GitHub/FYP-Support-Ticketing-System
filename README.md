@@ -1,4 +1,7 @@
 # FYP-Support-Ticketing-System
+
+Author: Adrian Chudzikiewicz
+
 # Structure
 
 The main system is divided into sub-folders which are spread-out throughout the project. This is because the project itself is a combination of MERN stack associated with other libraries which are used for testing. The system implements a 3rd party engine (Business Process Management) BPM, known as Camunda.
