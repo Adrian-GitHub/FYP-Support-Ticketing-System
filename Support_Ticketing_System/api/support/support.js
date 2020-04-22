@@ -95,10 +95,11 @@ const ClaimTicket = async(req, res) => {
     let Camunda_ID;
     const name = req.cookies['name'];
     const user_id = req.cookies['user_id'];
+    const username = req.cookies['username'];
     connection.collection("tickets").findOneAndUpdate({"_id": ObjectId(req.body.ticketID)} ,{"$set": {"currentSupportStaff": name, "staffId": user_id}}, (err, res) => {
         if(err) throw err;
     });
-    connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {staffId: user_id, action: 'Ticket Claimed', desc: "Ticket was claimed by ", staffName: name, date: new Date().toISOString()}}});
+    connection.collection("ticketHistory").updateOne({"ticketID": req.body.ticketID},{"$push":{records: {staffId: user_id, action: 'Ticket Claimed', desc: "Ticket was claimed by staff with a username: " + username, staffName: name, date: new Date().toISOString()}}});
     console.log("<PROCESS_MODIFIED>Support Staff claimed a ticket for themselves.");
 
     // Now, repeat this inside Camunda's engine
